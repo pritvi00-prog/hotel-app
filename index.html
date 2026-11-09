@@ -8,192 +8,266 @@
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#eef2f1; --surface:#ffffff; --ink:#10242b; --muted:#5b6e74; --line:#d3dcdb;
-  --accent:#2a3bd6; --accent-ink:#ffffff; --good:#13795b; --warn:#a05a00; --chip:#e1e8e7;
-  box-sizing:border-box;
-  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg:#f3f5f8; --surface:#ffffff; --ink:#0e1726; --muted:#5b6a7d; --line:#e2e7ee;
+  --accent:#2b3fe0; --accent-ink:#ffffff; --accent-soft:#e8ebfd;
+  --good:#0f7b5f; --good-soft:#dff3ec; --warn:#a85a00; --warn-soft:#fbecd5;
+  --plate:#0e1726; --plate-ink:#f3f5f8; --shadow:0 12px 32px rgba(14,23,38,.16);
+  --display:"Bricolage Grotesque","Instrument Sans",system-ui,sans-serif;
+  --r-s:10px; --r-m:16px; --r-l:24px;
   color-scheme:light;
 }
 @media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){
-    --bg:#0c1a1f; --surface:#14272e; --ink:#e8f0ef; --muted:#9bb0b5; --line:#27404a;
-    --accent:#8a96ff; --accent-ink:#0c1a1f; --good:#4fd1a5; --warn:#f0b35a; --chip:#1d3640;
+  :root{
+    --bg:#0a1220; --surface:#111c2e; --ink:#eaf0f8; --muted:#92a1b6; --line:#223049;
+    --accent:#8c9bff; --accent-ink:#0a1220; --accent-soft:#1b2750;
+    --good:#4fd1a5; --good-soft:#123a30; --warn:#f0b35a; --warn-soft:#3b2a0e;
+    --plate:#16233a; --plate-ink:#eaf0f8; --shadow:0 12px 32px rgba(0,0,0,.5);
     color-scheme:dark;
   }
 }
-:root[data-theme="dark"]{
-  --bg:#0c1a1f; --surface:#14272e; --ink:#e8f0ef; --muted:#9bb0b5; --line:#27404a;
-  --accent:#8a96ff; --accent-ink:#0c1a1f; --good:#4fd1a5; --warn:#f0b35a; --chip:#1d3640;
-  color-scheme:dark;
-}
-html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *,*::before,*::after{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.5 "Instrument Sans",system-ui,-apple-system,"Segoe UI",sans-serif}
-h1,h2,h3{font-family:"Bricolage Grotesque","Instrument Sans",system-ui,sans-serif;margin:0;letter-spacing:-.02em;line-height:1.1}
-button{font:inherit;cursor:pointer}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.5 "Instrument Sans",system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:var(--display);margin:0;letter-spacing:-.02em;line-height:1.1}
+button{font:inherit;color:inherit;cursor:pointer}
+ul{list-style:none;margin:0;padding:0}
+p{margin:0}
+.muted{color:var(--muted)}
+.num{font-variant-numeric:tabular-nums}
+.hidden{display:none !important}
 :focus-visible{outline:3px solid var(--accent);outline-offset:2px}
-.wrap{max-width:960px;margin:0 auto;padding:0 18px 90px}
+svg{width:18px;height:18px;flex:none;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 
-/* Header */
-.top{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;padding:22px 0 14px}
-.brand{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:1.05rem}
-.seg{display:inline-flex;background:var(--chip);border-radius:999px;padding:4px}
-.seg button{border:0;background:transparent;color:var(--muted);padding:8px 16px;border-radius:999px;font-weight:600}
-.seg button[aria-selected="true"]{background:var(--ink);color:var(--bg)}
+/* Bovenbalk */
+.bar{position:sticky;top:0;z-index:15;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.bar-in{max-width:1040px;margin:0 auto;padding:0 20px;height:60px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{display:flex;align-items:center;gap:10px;font:800 1.05rem var(--display);letter-spacing:-.01em}
+.mark{width:32px;height:32px;border-radius:10px;background:var(--ink);color:var(--bg);display:grid;place-items:center;font:800 1rem var(--display)}
+.nav{display:flex;gap:4px}
+.link{background:none;border:0;font-weight:600;padding:8px 12px;border-radius:var(--r-s)}
+.link:hover{background:var(--chip,color-mix(in srgb,var(--ink) 7%,transparent))}
 
-/* Hero: the room card */
-.card-room{background:var(--ink);color:var(--bg);border-radius:20px;padding:26px 24px;display:grid;gap:18px;grid-template-columns:1fr;position:relative;overflow:hidden}
-.card-room h1{font-size:clamp(2rem,6vw,3.2rem);font-weight:800;max-width:14ch}
-.card-room p{margin:0;opacity:.8;max-width:46ch}
-.room-field{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.room-field label{font-weight:600;opacity:.85}
-.room-field input{width:96px;font:800 1.6rem "Bricolage Grotesque",sans-serif;text-align:center;border:2px dashed currentColor;background:transparent;color:inherit;border-radius:12px;padding:6px 8px}
-.room-field input::placeholder{opacity:.4}
-.door{position:absolute;right:-18px;top:-18px;width:120px;height:120px;border-radius:50%;border:2px solid currentColor;opacity:.15}
-.door::after{content:"";position:absolute;inset:18px;border-radius:50%;border:2px solid currentColor}
+.wrap{max-width:1040px;margin:0 auto;padding:24px 20px 140px}
 
-/* Sections */
-.row-head{display:flex;justify-content:space-between;align-items:baseline;margin:34px 0 12px;gap:12px;flex-wrap:wrap}
-.row-head h2{font-size:1.5rem}
-.sub{color:var(--muted);font-size:.95rem}
-.list{display:grid;gap:12px}
-.rest{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;display:grid;grid-template-columns:52px 1fr auto;gap:14px;align-items:center}
-.logo{width:52px;height:52px;border-radius:12px;display:grid;place-items:center;font:800 1.2rem "Bricolage Grotesque",sans-serif;color:#fff}
-.rest h3{font-size:1.1rem}
-.meta{color:var(--muted);font-size:.9rem;margin-top:2px}
-.tag{display:inline-block;font-size:.8rem;font-weight:600;border-radius:999px;padding:2px 10px;background:var(--chip);color:var(--ink);margin-right:6px}
-.tag.direct{background:color-mix(in srgb,var(--good) 18%,transparent);color:var(--good)}
-.btn{border:0;border-radius:10px;padding:10px 16px;font-weight:600;background:var(--accent);color:var(--accent-ink)}
+/* Knoppen */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:12px;padding:12px 18px;font-weight:600;background:var(--accent);color:var(--accent-ink);transition:filter .15s}
+.btn:hover{filter:brightness(1.08)}
 .btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
-.btn[disabled]{opacity:.45;cursor:not-allowed}
+.btn.good{background:var(--good);color:#fff}
+.btn.block{width:100%}
 
-/* Menu panel */
-.panel{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px;margin-top:14px}
-.menu-item{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
-.menu-item:first-of-type{border-top:0}
-.qty{display:inline-flex;align-items:center;gap:10px}
-.qty button{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:1.1rem}
-.qty span{min-width:18px;text-align:center;font-weight:600}
+/* Hero: kamerplaat */
+.plate{background:var(--plate);color:var(--plate-ink);border-radius:var(--r-l);padding:28px;display:grid;gap:26px;align-items:center}
+.plate h1{font-size:clamp(2rem,5.5vw,3.2rem);font-weight:800;max-width:14ch}
+.plate p{opacity:.78;margin-top:12px;max-width:38ch}
+.roomcard{border:1px solid color-mix(in srgb,var(--plate-ink) 26%,transparent);border-radius:20px;padding:16px 20px 12px;text-align:center;background:color-mix(in srgb,var(--plate-ink) 6%,transparent)}
+.roomcard:focus-within{outline:3px solid color-mix(in srgb,var(--plate-ink) 75%,transparent);outline-offset:2px}
+.roomcard label{display:block;font-size:.92rem;opacity:.78}
+.roomcard input{width:100%;background:transparent;border:0;color:inherit;font:800 3.6rem/1.1 var(--display);text-align:center;letter-spacing:-.02em;outline:none}
+.roomcard input::placeholder{opacity:.28}
+@media (min-width:760px){.plate{grid-template-columns:1.4fr 1fr;padding:44px}}
 
-/* Cart bar */
-.cart{position:fixed;left:0;right:0;bottom:0;padding:12px 18px calc(12px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);display:flex;justify-content:center}
-.cart-in{width:100%;max-width:960px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
-.cart .btn{background:var(--bg);color:var(--ink)}
+/* Koppen */
+.sec-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:36px 0 16px}
+.sec-head h2{font-size:1.5rem;font-weight:700}
+
+/* Restaurantkaarten */
+.rests{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
+.rest{display:grid;grid-template-columns:56px 1fr 18px;gap:14px;align-items:center;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-m);padding:16px;transition:border-color .15s,transform .15s}
+.rest:hover{border-color:var(--accent)}
+.rest>svg{color:var(--muted)}
+.logo{width:56px;height:56px;border-radius:14px;display:grid;place-items:center;font:800 1.4rem var(--display);color:#fff}
+.logo.lg{width:64px;height:64px;font-size:1.6rem}
+.rest-name{display:block;font:700 1.12rem var(--display);letter-spacing:-.01em}
+.meta{display:flex;gap:14px;flex-wrap:wrap;color:var(--muted);font-size:.9rem;margin-top:2px}
+.meta span{display:inline-flex;align-items:center;gap:5px}
+.meta svg{width:14px;height:14px}
+.badge{display:inline-flex;align-items:center;gap:5px;margin-top:8px;font-size:.82rem;font-weight:600;padding:3px 10px;border-radius:999px;background:var(--accent-soft);color:var(--accent)}
+.badge svg{width:13px;height:13px}
+.badge.direct{background:var(--good-soft);color:var(--good)}
+.skel{min-height:90px;border:0;background:linear-gradient(90deg,var(--line),color-mix(in srgb,var(--line) 40%,var(--surface)),var(--line));background-size:200% 100%}
+@media (prefers-reduced-motion:no-preference){.skel{animation:sh 1.3s linear infinite}@keyframes sh{to{background-position:-200% 0}}}
+
+/* Menu */
+.back{display:inline-flex;align-items:center;gap:6px;background:none;border:0;font-weight:600;color:var(--muted);padding:6px 0;margin-bottom:12px}
+.back:hover{color:var(--ink)}
+.mhead{display:flex;gap:16px;align-items:center}
+.mhead h2{font-size:1.9rem;font-weight:800}
+.deliv{margin:16px 0 8px;padding:12px 16px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-s);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.textbtn{background:none;border:0;color:var(--accent);font-weight:600;padding:0}
+.items{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-m);margin-top:12px}
+.item{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:16px 18px}
+.item+.item{border-top:1px solid var(--line)}
+.item-name{display:block;font-weight:600}
+.item-price{color:var(--muted);font-variant-numeric:tabular-nums}
+.add{display:inline-flex;align-items:center;gap:6px;background:var(--accent-soft);color:var(--accent);border:0;border-radius:999px;padding:8px 14px;font-weight:600}
+.step{display:inline-flex;align-items:center;gap:4px;background:var(--accent-soft);border-radius:999px;padding:3px}
+.step button{width:34px;height:34px;border-radius:50%;border:0;background:var(--surface);color:var(--accent);display:grid;place-items:center}
+.step output{min-width:28px;text-align:center;font-weight:700;font-variant-numeric:tabular-nums}
+
+/* Winkelmand */
+.cart{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));max-width:640px;margin:0 auto;background:var(--ink);color:var(--bg);border-radius:20px;padding:10px 10px 10px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;box-shadow:var(--shadow);z-index:20}
+.cart small{display:block;opacity:.7}
+.cart strong{font-size:1.1rem;font-variant-numeric:tabular-nums}
+
+/* Bevestiging */
+.done{max-width:520px;margin:40px auto 0;text-align:center;display:grid;gap:16px;justify-items:center}
+.done-icon{width:72px;height:72px;border-radius:50%;background:var(--good-soft);color:var(--good);display:grid;place-items:center}
+.done-icon svg{width:34px;height:34px;stroke-width:2.5}
+.done h2{font-size:2rem;font-weight:800}
+.summary{width:100%;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-m);padding:6px 18px}
+.summary li{display:flex;justify-content:space-between;gap:12px;padding:10px 0}
+.summary li+li{border-top:1px solid var(--line)}
+.summary .tot{font-weight:700}
 
 /* Dashboard */
-.order{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;display:grid;gap:10px}
-.order-top{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline}
-.status{font-weight:600;font-size:.85rem;border-radius:999px;padding:3px 12px;background:var(--chip)}
-.status.Nieuw{background:color-mix(in srgb,var(--warn) 20%,transparent);color:var(--warn)}
-.status.Bezorgd{background:color-mix(in srgb,var(--good) 20%,transparent);color:var(--good)}
-.empty{border:2px dashed var(--line);border-radius:14px;padding:28px;text-align:center;color:var(--muted)}
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
-.stat{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px}
-.stat b{display:block;font:800 1.9rem "Bricolage Grotesque",sans-serif;margin-top:4px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 14px;font-weight:600;color:var(--muted)}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.chip b{margin-left:6px;font-variant-numeric:tabular-nums}
+.orders{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(310px,1fr))}
+.order{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-m);padding:18px;display:grid;gap:14px;align-content:start}
+.order header{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.order h3{font-size:1.35rem;font-weight:800}
+.pill{font-size:.82rem;font-weight:600;padding:3px 12px;border-radius:999px;background:var(--accent-soft);color:var(--accent);white-space:nowrap}
+.pill.s-Nieuw{background:var(--warn-soft);color:var(--warn)}
+.pill.s-Bezorgd{background:var(--good-soft);color:var(--good)}
+.lines li{display:grid;grid-template-columns:34px 1fr auto;gap:8px;padding:3px 0}
+.lines li span:first-child{color:var(--muted);font-variant-numeric:tabular-nums}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+.steps i{height:5px;border-radius:3px;background:var(--line)}
+.steps i.on{background:var(--good)}
+.order footer{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.empty{border:1.5px dashed var(--line);border-radius:var(--r-m);padding:36px 20px;text-align:center;color:var(--muted);grid-column:1/-1}
+
+/* Hotel */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-m);padding:18px}
+.stat span{color:var(--muted);font-size:.92rem}
+.stat b{display:block;font:800 2rem var(--display);letter-spacing:-.02em;margin-top:2px;font-variant-numeric:tabular-nums}
+.stat.hl{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.stat.hl span{color:inherit;opacity:.75}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-m);padding:18px}
+.bars{display:grid;gap:14px}
+.bar-row{display:grid;grid-template-columns:150px 1fr 90px;gap:12px;align-items:center}
+.bar-track{height:10px;background:var(--line);border-radius:5px;overflow:hidden}
+.bar-fill{height:100%;background:var(--accent);border-radius:5px}
+.bar-val{text-align:right;font-weight:600;font-variant-numeric:tabular-nums}
 .scroll{overflow-x:auto}
-table{width:100%;border-collapse:collapse;font-size:.95rem;min-width:520px}
-th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line)}
-th{color:var(--muted);font-weight:600}
+table{width:100%;border-collapse:collapse;min-width:540px}
+th,td{text-align:left;padding:12px 8px;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+th{color:var(--muted);font-weight:600;font-size:.9rem}
+tr:last-child td{border-bottom:0}
+@media (max-width:560px){.bar-row{grid-template-columns:1fr 80px}.bar-row .bar-track{grid-column:1/-1;order:3}}
+
+/* Inloggen */
+.login{max-width:420px;margin:40px auto 0;display:grid;gap:14px}
+.login h2{font-size:1.9rem;font-weight:800}
+.field{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:13px 14px;width:100%}
+.err{color:var(--warn);font-weight:600;min-height:1.4em}
 
 /* Modal */
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:flex-end;justify-content:center;padding:18px;z-index:10}
+.modal{position:fixed;inset:0;background:rgba(8,14,26,.55);display:none;align-items:flex-end;justify-content:center;padding:14px;z-index:30}
 .modal.open{display:flex}
-.sheet{background:var(--surface);border-radius:18px;padding:24px;max-width:460px;width:100%;display:grid;gap:14px}
-.sheet h3{font-size:1.4rem}
-.addr{background:var(--chip);border-radius:10px;padding:12px;font-weight:600}
-.toast{position:fixed;left:50%;top:calc(14px + env(safe-area-inset-top,0px));transform:translateX(-50%);background:var(--good);color:#fff;padding:10px 18px;border-radius:999px;font-weight:600;display:none;z-index:20}
+.sheet{background:var(--surface);border-radius:var(--r-l);padding:26px;max-width:460px;width:100%;display:grid;gap:14px;box-shadow:var(--shadow)}
+.sheet h3{font-size:1.5rem;font-weight:800}
+.addr{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-weight:600}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+@media (min-width:700px){.modal{align-items:center}}
+
+.toast{position:fixed;left:50%;top:72px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:11px 20px;border-radius:999px;font-weight:600;display:none;z-index:40;box-shadow:var(--shadow);max-width:92vw}
 .toast.show{display:block}
-.field{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;width:100%}
-.hidden{display:none !important}
-@media (min-width:700px){.card-room{grid-template-columns:1.3fr 1fr;align-items:end;padding:34px}.modal{align-items:center}}
-@media (prefers-reduced-motion:no-preference){.toast.show{animation:pop .25s ease-out}@keyframes pop{from{opacity:0;transform:translate(-50%,-8px)}}}
+@media (prefers-reduced-motion:no-preference){.toast.show{animation:pop .22s ease-out}@keyframes pop{from{opacity:0;transform:translate(-50%,-8px)}}}
 </style>
 </head>
 <body>
-<div class="toast" id="toast" role="status"></div>
-<div class="wrap">
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <header class="top">
-    <div class="brand">Hotel Maashaven · demo</div>
-    <div class="seg" role="tablist" aria-label="Weergave">
-      <button role="tab" aria-selected="true" data-view="guest">Gast</button>
-      <button role="tab" aria-selected="false" data-view="rest">Restaurant</button>
-      <button role="tab" aria-selected="false" data-view="hotel">Hotel</button>
-    </div>
-    <button class="btn ghost hidden" id="logout">Uitloggen</button>
-  </header>
+<header class="bar">
+  <div class="bar-in">
+    <div class="brand"><span class="mark" aria-hidden="true">M</span><span>Hotel Maashaven</span></div>
+    <nav class="nav" aria-label="Navigatie">
+      <button class="link" id="nav-guest">Gastapp</button>
+      <button class="link" id="nav-dash">Dashboard</button>
+      <button class="link" id="nav-staff">Personeel</button>
+      <button class="link" id="logout">Uitloggen</button>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
 
   <!-- GAST -->
   <section id="v-guest">
-    <div class="card-room">
-      <div class="door" aria-hidden="true"></div>
-      <div>
-        <h1>Honger? Bestel uit de buurt.</h1>
-        <p>Kies een restaurant. We bezorgen op je kamer.</p>
+    <div id="g-list">
+      <div class="plate">
+        <div>
+          <h1>Honger? Bestel uit de buurt.</h1>
+          <p>Kies een restaurant en we brengen het naar je kamer.</p>
+        </div>
+        <div class="roomcard">
+          <label for="room">Jouw kamernummer</label>
+          <input id="room" inputmode="numeric" maxlength="4" placeholder="304" autocomplete="off">
+        </div>
       </div>
-      <div class="room-field">
-        <label for="room">Kamernummer</label>
-        <input id="room" inputmode="numeric" maxlength="4" placeholder="304">
-      </div>
+      <div class="sec-head"><h2>Restaurants in de buurt</h2></div>
+      <div class="rests" id="rests"></div>
     </div>
-
-    <div class="row-head"><h2>Restaurants in de buurt</h2><span class="sub" id="count"></span></div>
-    <div class="list" id="rests"></div>
-    <div id="menu"></div>
+    <div id="g-menu" class="hidden"></div>
+    <div id="g-done" class="hidden"></div>
   </section>
 
   <!-- INLOGGEN -->
   <section id="v-login" class="hidden">
-    <div class="row-head"><h2>Inloggen</h2></div>
-    <div class="panel" style="display:grid;gap:12px;max-width:420px">
-      <p class="sub" id="login-msg" style="margin:0"></p>
+    <div class="login">
+      <h2>Personeel inloggen</h2>
+      <p class="muted">Voor medewerkers van het hotel en de restaurants.</p>
       <input class="field" id="l-mail" type="email" autocomplete="username" placeholder="E-mailadres" aria-label="E-mailadres">
       <input class="field" id="l-pw" type="password" autocomplete="current-password" placeholder="Wachtwoord" aria-label="Wachtwoord">
-      <button class="btn" id="l-go">Inloggen</button>
+      <p class="err" id="l-err" role="alert"></p>
+      <button class="btn block" id="l-go">Inloggen</button>
     </div>
   </section>
 
   <!-- RESTAURANT -->
   <section id="v-rest" class="hidden">
-    <div class="row-head"><h2>Dashboard restaurant</h2>
-      <select id="restPick" class="btn ghost" aria-label="Kies restaurant"></select>
-    </div>
-    <p class="sub">Zo ziet een restaurant de bestellingen van hotelgasten binnenkomen.</p>
-    <div class="list" id="orders"></div>
+    <div class="sec-head" style="margin-top:8px"><h2 id="rest-title">Bestellingen</h2><span class="muted" id="rest-sync"></span></div>
+    <div class="chips" id="chips"></div>
+    <div class="orders" id="orders"></div>
   </section>
 
   <!-- HOTEL -->
   <section id="v-hotel" class="hidden">
-    <div class="row-head"><h2>Commissie voor het hotel</h2></div>
+    <div class="sec-head" style="margin-top:8px"><h2>Overzicht hotel</h2><span class="muted" id="hotel-sync"></span></div>
     <div class="stats">
-      <div class="stat"><span class="sub">Directe bestellingen</span><b id="s-orders">0</b></div>
-      <div class="stat"><span class="sub">Omzet via app</span><b id="s-rev">€ 0,00</b></div>
-      <div class="stat"><span class="sub">Commissie hotel</span><b id="s-com">€ 0,00</b></div>
-      <div class="stat"><span class="sub">Doorverwijzingen</span><b id="s-ref">0</b></div>
+      <div class="stat"><span>Bestellingen</span><b id="s-orders">0</b></div>
+      <div class="stat"><span>Omzet via de app</span><b id="s-rev">€ 0,00</b></div>
+      <div class="stat hl"><span>Commissie voor het hotel</span><b id="s-com">€ 0,00</b></div>
+      <div class="stat"><span>Gemiddelde bestelling</span><b id="s-avg">€ 0,00</b></div>
     </div>
-    <div class="row-head"><h2>Alle activiteit</h2></div>
+    <div class="sec-head"><h2>Commissie per restaurant</h2></div>
+    <div class="panel"><div class="bars" id="bars"></div></div>
+    <div class="sec-head"><h2>Laatste bestellingen</h2></div>
     <div class="panel scroll"><table>
-      <thead><tr><th>Tijd</th><th>Kamer</th><th>Restaurant</th><th>Methode</th><th>Bedrag</th><th>Commissie</th></tr></thead>
+      <thead><tr><th>Tijd</th><th>Kamer</th><th>Restaurant</th><th>Status</th><th>Bedrag</th><th>Commissie</th></tr></thead>
       <tbody id="log"></tbody>
     </table></div>
-    <p class="sub">Directe bestellingen: vaste commissie per restaurant. Doorverwijzingen: geschatte affiliate-commissie, pas bekend na bevestiging door het platform.</p>
   </section>
-</div>
+</main>
 
 <div class="cart hidden" id="cart">
-  <div class="cart-in">
-    <div><strong id="cart-n">0 items</strong> · <span id="cart-t"></span><span class="sub" id="cart-r" style="color:inherit;opacity:.7"></span></div>
-    <button class="btn" id="place">Bestel op kamer</button>
-  </div>
+  <div><strong id="cart-t"></strong><small id="cart-n"></small></div>
+  <button class="btn" id="place">Bestel naar kamer <span id="place-room"></span></button>
 </div>
 
 <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="m-title">
   <div class="sheet">
     <h3 id="m-title"></h3>
-    <p id="m-text" style="margin:0"></p>
+    <p class="muted" id="m-text"></p>
     <div class="addr" id="m-addr"></div>
-    <div style="display:flex;gap:10px;flex-wrap:wrap">
+    <p class="muted" style="font-size:.9rem">Kopieer het adres en plak het bij het afrekenen.</p>
+    <div class="row">
       <button class="btn" id="m-go">Ga naar bestellen</button>
+      <button class="btn ghost" id="m-copy">Kopieer adres</button>
       <button class="btn ghost" id="m-close">Annuleren</button>
     </div>
   </div>
@@ -201,25 +275,41 @@ th{color:var(--muted);font-weight:600}
 
 <script>
 const HOTEL = "Hotel Maashaven, Maashaven Zuidzijde 1, Rotterdam";
-const eur = n => n.toLocaleString("nl-NL",{style:"currency",currency:"EUR"});
+const $ = s => document.querySelector(s);
+const eur = n => Number(n).toLocaleString("nl-NL",{style:"currency",currency:"EUR"});
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const hhmm = d => d.toLocaleTimeString("nl-NL",{hour:"2-digit",minute:"2-digit"});
+function ago(d){ const m = Math.round((Date.now() - d) / 60000); return m < 1 ? "zojuist" : m < 60 ? m + " min geleden" : Math.floor(m / 60) + " uur geleden"; }
+
+const I = {
+  back:'<svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>',
+  next:'<svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>',
+  ext:'<svg viewBox="0 0 24 24"><path d="M7 17L17 7M8 7h9v9"/></svg>',
+  plus:'<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>',
+  minus:'<svg viewBox="0 0 24 24"><path d="M5 12h14"/></svg>',
+  check:'<svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>',
+  clock:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+  bag:'<svg viewBox="0 0 24 24"><path d="M6 8h12l-1 12H7L6 8zM9 8a3 3 0 016 0"/></svg>'
+};
 
 const FALLBACK = [
-  {id:"mcd", name:"McDonald’s", kind:"Burgers", time:"20–30 min", color:"#c8102e", method:"refer", platform:"Uber Eats", url:"https://www.ubereats.com/nl", rate:0.03},
-  {id:"kfc", name:"KFC", kind:"Kip", time:"25–35 min", color:"#a3080b", method:"refer", platform:"Thuisbezorgd", url:"https://www.thuisbezorgd.nl", rate:0.03},
-  {id:"nap", name:"Pizzeria Napoli", kind:"Pizza", time:"30–40 min", color:"#2f7d32", method:"direct", rate:0.10,
-    menu:[["Margherita",9.5],["Pepperoni",11.5],["Quattro Formaggi",12.5],["Tiramisu",5.5]]},
-  {id:"snk", name:"Snackbar De Hoek", kind:"Snacks", time:"15–25 min", color:"#b8860b", method:"direct", rate:0.10,
-    menu:[["Friet met mayo",3.5],["Frikandel speciaal",3.2],["Kapsalon",10.5],["Kroket",2.6]]},
-  {id:"wok", name:"Wok Palace", kind:"Chinees", time:"30–45 min", color:"#7b1fa2", method:"direct", rate:0.12,
-    menu:[["Babi pangang",11.9],["Nasi goreng",10.5],["Loempia’s (4x)",5.5],["Bami goreng",10.5]]}
+  {id:"mcd", name:"McDonald’s", kind:"Burgers", time:"20–30 min", color:"#b3261e", method:"refer", platform:"Uber Eats", url:"https://www.ubereats.com/nl", rate:0.03, menu:[]},
+  {id:"kfc", name:"KFC", kind:"Kip", time:"25–35 min", color:"#8c1c13", method:"refer", platform:"Thuisbezorgd", url:"https://www.thuisbezorgd.nl", rate:0.03, menu:[]},
+  {id:"nap", name:"Pizzeria Napoli", kind:"Pizza", time:"30–40 min", color:"#2f6f3a", method:"direct", rate:0.10, menu:[["Margherita",9.5],["Pepperoni",11.5],["Quattro Formaggi",12.5],["Tiramisu",5.5]]},
+  {id:"snk", name:"Snackbar De Hoek", kind:"Snacks", time:"15–25 min", color:"#946c0a", method:"direct", rate:0.10, menu:[["Friet met mayo",3.5],["Frikandel speciaal",3.2],["Kapsalon",10.5],["Kroket",2.6]]},
+  {id:"wok", name:"Wok Palace", kind:"Chinees", time:"30–45 min", color:"#6a2a8a", method:"direct", rate:0.12, menu:[["Babi pangang",11.9],["Nasi goreng",10.5],["Loempia’s (4x)",5.5],["Bami goreng",10.5]]}
 ];
 
-const state = {view:"guest", open:null, cart:{}, orders:[], refs:[], seq:1000, pending:null};
+const state = {view:"guest", open:null, cart:{}, orders:[], pending:null, filter:"Actief", done:null, loaded:false, auth:null};
+let RESTAURANTS = FALLBACK;
+const find = id => RESTAURANTS.find(r => r.id === id);
+const room = () => ($("#room").value || "").trim();
 
-/* Supabase */
+function toast(t){ const el = $("#toast"); el.textContent = t; el.classList.add("show"); clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove("show"), 2600); }
+
+/* ---------- Supabase ---------- */
 const SB_URL = "https://veggbrabijaqdlomwtkg.supabase.co";
 const SB_KEY = "sb_publishable_pkk9dkAiGWNXAJ8TfrVvvw_JpLzagL0";
-let RESTAURANTS = FALLBACK;
 
 async function sb(path, opts = {}){
   const res = await fetch(SB_URL + "/rest/v1/" + path, {
@@ -233,10 +323,33 @@ async function sb(path, opts = {}){
   return txt ? JSON.parse(txt) : null;
 }
 
-/* Inloggen */
-state.auth = null;
+async function loadData(){
+  try{
+    const [rs, ms] = await Promise.all([sb("restaurants?select=*&order=name"), sb("menu_items?select=*&order=id")]);
+    RESTAURANTS = rs.map(r => {
+      const f = FALLBACK.find(x => x.id === r.id) || {};
+      return {id:r.id, name:r.name, kind:r.kind, time:f.time || "30–40 min", color:f.color || "#3d4a5c",
+        method:r.method, platform:r.platform, url:r.url, rate:Number(r.rate),
+        menu: ms.filter(m => m.restaurant_id === r.id).map(m => [m.name, Number(m.price)])};
+    });
+  }catch(e){ console.error(e); toast("Database niet bereikbaar, voorbeelddata getoond"); }
+  state.loaded = true;
+  renderRests();
+}
+
+async function loadOrders(){
+  try{
+    const rows = await sb("orders?select=*&order=created_at.desc&limit=200");
+    state.orders = rows.map(o => ({id:o.id, t:new Date(o.created_at), room:o.room, restId:o.restaurant_id,
+      rest:(find(o.restaurant_id) || {}).name || o.restaurant_id,
+      items:o.items, total:Number(o.total), com:Number(o.commission), status:o.status}));
+  }catch(e){ console.error(e); }
+}
+
+/* ---------- Inloggen ---------- */
 async function login(){
   const email = $("#l-mail").value.trim(), password = $("#l-pw").value;
+  $("#l-err").textContent = "";
   try{
     const res = await fetch(SB_URL + "/auth/v1/token?grant_type=password", {method:"POST",
       headers:{apikey:SB_KEY,"Content-Type":"application/json"}, body:JSON.stringify({email,password})});
@@ -244,187 +357,213 @@ async function login(){
     const s = await res.json();
     state.auth = {token:s.access_token, role:null, restaurant_id:null, email};
     const rows = await sb("staff?select=*");
-    if(!rows || !rows.length){ state.auth = null; toast("Geen toegang voor dit account"); return; }
+    if(!rows || !rows.length){ state.auth = null; $("#l-err").textContent = "Dit account heeft geen toegang."; return; }
     state.auth.role = rows[0].role; state.auth.restaurant_id = rows[0].restaurant_id;
-    $("#l-pw").value = ""; $("#logout").classList.remove("hidden");
-    document.querySelector('.seg button[data-view="' + (state.auth.role === "hotel" ? "hotel" : "rest") + '"]').click();
-  }catch(e){ state.auth = null; toast("Inloggen mislukt: controleer e-mail en wachtwoord"); }
+    $("#l-pw").value = "";
+    go(state.auth.role === "hotel" ? "hotel" : "rest");
+  }catch(e){ state.auth = null; $("#l-err").textContent = "Inloggen mislukt. Controleer e-mail en wachtwoord."; }
 }
-function logout(){
-  state.auth = null; state.orders = [];
-  $("#restPick").innerHTML = ""; $("#logout").classList.add("hidden");
-  render();
+function logout(){ state.auth = null; state.orders = []; go("guest"); }
+
+/* ---------- Navigatie ---------- */
+function go(v){
+  if((v === "rest" || v === "hotel") && !(state.auth && state.auth.role === (v === "rest" ? "restaurant" : "hotel"))) v = "login";
+  state.view = v;
+  ["guest","login","rest","hotel"].forEach(x => $("#v-" + x).classList.toggle("hidden", x !== v));
+  $("#nav-guest").classList.toggle("hidden", v === "guest");
+  $("#nav-dash").classList.toggle("hidden", !(state.auth && v === "guest"));
+  $("#nav-staff").classList.toggle("hidden", !(!state.auth && v === "guest"));
+  $("#logout").classList.toggle("hidden", !state.auth);
+  window.scrollTo(0, 0);
+  refresh();
+}
+async function refresh(){
+  updateCart();
+  if(state.view === "rest"){ await loadOrders(); renderRestView(); }
+  if(state.view === "hotel"){ await loadOrders(); renderHotel(); }
 }
 
-async function loadData(){
-  try{
-    const [rs, ms] = await Promise.all([sb("restaurants?select=*&order=name"), sb("menu_items?select=*&order=id")]);
-    RESTAURANTS = rs.map(r => {
-      const f = FALLBACK.find(x => x.id === r.id) || {};
-      return {id:r.id, name:r.name, kind:r.kind, time:f.time || "30–40 min", color:f.color || "#444",
-        method:r.method, platform:r.platform, url:r.url, rate:Number(r.rate),
-        menu: ms.filter(m => m.restaurant_id === r.id).map(m => [m.name, Number(m.price)])};
-    });
-  }catch(e){ console.error(e); toast("Database niet bereikbaar, voorbeelddata getoond"); }
-  renderRests();
-}
-
-async function loadOrders(){
-  try{
-    const rows = await sb("orders?select=*&order=created_at.desc");
-    state.orders = rows.map(o => ({id:o.id, t:new Date(o.created_at), room:o.room, restId:o.restaurant_id,
-      rest:(RESTAURANTS.find(r => r.id === o.restaurant_id) || {}).name || o.restaurant_id,
-      items:o.items, total:Number(o.total), com:Number(o.commission), status:o.status}));
-  }catch(e){ console.error(e); toast("Bestellingen laden mislukt"); }
-}
-const $ = s => document.querySelector(s);
-
-function toast(t){const el=$("#toast");el.textContent=t;el.classList.add("show");setTimeout(()=>el.classList.remove("show"),2400)}
-const room = () => ($("#room").value||"").trim();
-
-/* Tabs */
-document.querySelectorAll(".seg button").forEach(b=>b.addEventListener("click",()=>{
-  state.view=b.dataset.view;
-  document.querySelectorAll(".seg button").forEach(x=>x.setAttribute("aria-selected",x===b));
-  ["guest","rest","hotel"].forEach(v=>$("#v-"+v).classList.toggle("hidden",v!==state.view));
-  render();
-}));
-
-/* Gast */
+/* ---------- Gast ---------- */
 function renderRests(){
-  $("#count").textContent = RESTAURANTS.length + " plekken";
-  $("#rests").innerHTML = RESTAURANTS.map(r=>`
-    <div class="rest">
-      <div class="logo" style="background:${r.color}" aria-hidden="true">${r.name[0]}</div>
-      <div>
-        <h3>${r.name}</h3>
-        <div class="meta"><span class="tag ${r.method==="direct"?"direct":""}">${r.method==="direct"?"Direct bestellen":"Via "+r.platform}</span>${r.kind} · ${r.time}</div>
-      </div>
-      <button class="btn" data-id="${r.id}">${r.method==="direct"?"Bekijk menu":"Bestel"}</button>
-    </div>`).join("");
-  $("#rests").querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>pick(b.dataset.id)));
+  const el = $("#rests");
+  if(!state.loaded){ el.innerHTML = '<div class="rest skel"></div>'.repeat(4); return; }
+  el.innerHTML = RESTAURANTS.map(r => `
+    <button class="rest" data-id="${esc(r.id)}">
+      <span class="logo" style="background:${esc(r.color)}" aria-hidden="true">${esc(r.name[0])}</span>
+      <span>
+        <span class="rest-name">${esc(r.name)}</span>
+        <span class="meta"><span>${esc(r.kind)}</span><span>${I.clock}${esc(r.time)}</span></span>
+        ${r.method === "direct"
+          ? `<span class="badge direct">${I.check}Direct bestellen</span>`
+          : `<span class="badge">${I.ext}Via ${esc(r.platform)}</span>`}
+      </span>
+      ${I.next}
+    </button>`).join("");
 }
+$("#rests").addEventListener("click", e => { const b = e.target.closest("button.rest"); if(b) pick(b.dataset.id); });
 
 function pick(id){
-  const r = RESTAURANTS.find(x=>x.id===id);
-  if(!room()){toast("Vul eerst je kamernummer in");$("#room").focus();return}
-  if(r.method==="refer"){
-    state.pending=r;
-    $("#m-title").textContent = "Verder naar "+r.platform;
-    $("#m-text").textContent = "Je bestelt bij "+r.name+" via "+r.platform+". Bezorgadres:";
+  const r = find(id);
+  if(!room()){ toast("Vul eerst je kamernummer in"); $("#room").focus(); return; }
+  if(r.method === "refer"){
+    state.pending = r;
+    $("#m-title").textContent = "Verder naar " + r.platform;
+    $("#m-text").textContent = "Je bestelt bij " + r.name + " via " + r.platform + ". Bezorgadres:";
     $("#m-addr").textContent = HOTEL + ", kamer " + room();
     $("#modal").classList.add("open");
     return;
   }
-  state.open = id; state.cart = {};
-  renderMenu(); updateCart();
-  $("#menu").scrollIntoView({behavior:"smooth",block:"start"});
+  state.open = id; state.cart = {}; state.done = null;
+  renderGuest(); window.scrollTo(0, 0);
 }
-
-$("#m-close").addEventListener("click",()=>$("#modal").classList.remove("open"));
-$("#m-go").addEventListener("click",()=>{
-  const r=state.pending;
-  state.refs.push({t:new Date(),room:room(),rest:r.name,platform:r.platform,est:0});
-  window.open(r.url,"_blank","noopener");
+$("#m-close").addEventListener("click", () => $("#modal").classList.remove("open"));
+$("#m-copy").addEventListener("click", async () => {
+  try{ await navigator.clipboard.writeText($("#m-addr").textContent); toast("Adres gekopieerd"); }
+  catch(e){ toast("Kopiëren lukt niet, selecteer het adres zelf"); }
+});
+$("#m-go").addEventListener("click", () => {
+  window.open(state.pending.url, "_blank", "noopener");
   $("#modal").classList.remove("open");
-  toast("Doorverwijzing geregistreerd");
 });
 
-function renderMenu(){
-  const r = RESTAURANTS.find(x=>x.id===state.open);
-  if(!r){$("#menu").innerHTML="";return}
-  $("#menu").innerHTML = `<div class="panel"><h2 style="font-size:1.3rem;margin-bottom:6px">${r.name}</h2>
-    ${r.menu.map((m,i)=>`<div class="menu-item"><div><strong>${m[0]}</strong><div class="meta">${eur(m[1])}</div></div>
-      <div class="qty"><button aria-label="Minder ${m[0]}" data-i="${i}" data-d="-1">−</button><span id="q${i}">${state.cart[i]||0}</span><button aria-label="Meer ${m[0]}" data-i="${i}" data-d="1">+</button></div></div>`).join("")}</div>`;
-  $("#menu").querySelectorAll(".qty button").forEach(b=>b.addEventListener("click",()=>{
-    const i=+b.dataset.i, d=+b.dataset.d;
-    state.cart[i]=Math.max(0,(state.cart[i]||0)+d);
-    $("#q"+i).textContent=state.cart[i]; updateCart();
-  }));
+function renderGuest(){
+  const r = state.open ? find(state.open) : null;
+  $("#g-list").classList.toggle("hidden", !!r || !!state.done);
+  $("#g-menu").classList.toggle("hidden", !r || !!state.done);
+  $("#g-done").classList.toggle("hidden", !state.done);
+  if(r && !state.done) renderMenu(r);
+  if(state.done) renderDone();
+  updateCart();
 }
+
+function renderMenu(r){
+  $("#g-menu").innerHTML = `
+    <button class="back" id="back">${I.back}<span>Alle restaurants</span></button>
+    <div class="mhead">
+      <span class="logo lg" style="background:${esc(r.color)}" aria-hidden="true">${esc(r.name[0])}</span>
+      <div><h2>${esc(r.name)}</h2><div class="meta"><span>${esc(r.kind)}</span><span>${I.clock}${esc(r.time)}</span></div></div>
+    </div>
+    <div class="deliv"><span>Bezorging naar kamer <b>${esc(room())}</b></span><button class="textbtn" id="chg">Wijzig</button></div>
+    <ul class="items" id="items"></ul>`;
+  renderItems(r);
+}
+function renderItems(r){
+  $("#items").innerHTML = r.menu.map((m, i) => {
+    const q = state.cart[i] || 0, n = esc(m[0]);
+    return `<li class="item"><div><span class="item-name">${n}</span><span class="item-price">${eur(m[1])}</span></div>` +
+      (q ? `<div class="step"><button data-i="${i}" data-d="-1" aria-label="Minder ${n}">${I.minus}</button><output>${q}</output><button data-i="${i}" data-d="1" aria-label="Meer ${n}">${I.plus}</button></div>`
+         : `<button class="add" data-i="${i}" data-d="1" aria-label="Voeg ${n} toe">${I.plus}<span>Toevoegen</span></button>`) + `</li>`;
+  }).join("");
+}
+$("#g-menu").addEventListener("click", e => {
+  const r = state.open ? find(state.open) : null; if(!r) return;
+  if(e.target.closest("#back")){ state.open = null; state.cart = {}; renderGuest(); return; }
+  if(e.target.closest("#chg")){ state.open = null; state.cart = {}; renderGuest(); $("#room").focus(); return; }
+  const b = e.target.closest("button[data-d]"); if(!b) return;
+  const i = +b.dataset.i; state.cart[i] = Math.max(0, (state.cart[i] || 0) + (+b.dataset.d));
+  renderItems(r); updateCart();
+});
 
 function cartTotals(){
-  const r = RESTAURANTS.find(x=>x.id===state.open); if(!r) return {n:0,t:0,items:[]};
-  const items = Object.entries(state.cart).filter(([,q])=>q>0).map(([i,q])=>({name:r.menu[i][0],q,p:r.menu[i][1]}));
-  return {n:items.reduce((a,x)=>a+x.q,0), t:items.reduce((a,x)=>a+x.q*x.p,0), items};
+  const r = state.open ? find(state.open) : null; if(!r) return {n:0, t:0, items:[]};
+  const items = Object.entries(state.cart).filter(([, q]) => q > 0).map(([i, q]) => ({name:r.menu[i][0], q, p:r.menu[i][1]}));
+  return {n:items.reduce((a, x) => a + x.q, 0), t:items.reduce((a, x) => a + x.q * x.p, 0), items};
 }
 function updateCart(){
-  const c=cartTotals();
-  $("#cart").classList.toggle("hidden",c.n===0||state.view!=="guest");
-  $("#cart-n").textContent = c.n+(c.n===1?" item":" items");
+  const c = cartTotals();
+  $("#cart").classList.toggle("hidden", !(c.n > 0 && state.view === "guest" && state.open && !state.done));
+  $("#cart-n").textContent = c.n + (c.n === 1 ? " item" : " items");
   $("#cart-t").textContent = eur(c.t);
+  $("#place-room").textContent = room();
 }
-$("#place").addEventListener("click",async ()=>{
-  const r=RESTAURANTS.find(x=>x.id===state.open), c=cartTotals();
-  if(!room()){toast("Vul eerst je kamernummer in");return}
+$("#place").addEventListener("click", async () => {
+  const r = find(state.open), c = cartTotals();
+  if(!room()){ toast("Vul eerst je kamernummer in"); return; }
+  const btn = $("#place"); btn.disabled = true;
   try{
-    await sb("orders",{method:"POST",headers:{Prefer:"return=minimal"},body:JSON.stringify({restaurant_id:r.id,room:room(),items:c.items,total:c.t,commission:Math.round(c.t*r.rate*100)/100})});
-  }catch(e){console.error(e);toast("Bestellen mislukt, probeer opnieuw");return}
-  state.cart={}; state.open=null; renderMenu(); updateCart();
-  toast("Besteld! "+r.name+" ontvangt je bestelling");
-  window.scrollTo({top:0,behavior:"smooth"});
+    await sb("orders", {method:"POST", headers:{Prefer:"return=minimal"},
+      body:JSON.stringify({restaurant_id:r.id, room:room(), items:c.items, total:c.t, commission:Math.round(c.t * r.rate * 100) / 100})});
+  }catch(e){ console.error(e); toast("Bestellen mislukt, probeer opnieuw"); btn.disabled = false; return; }
+  btn.disabled = false;
+  state.done = {rest:r.name, items:c.items, total:c.t, room:room()};
+  state.open = null; state.cart = {};
+  renderGuest(); window.scrollTo(0, 0);
+});
+function renderDone(){
+  const d = state.done;
+  $("#g-done").innerHTML = `<div class="done">
+    <div class="done-icon">${I.check}</div>
+    <h2>Bestelling geplaatst</h2>
+    <p class="muted">${esc(d.rest)} heeft je bestelling ontvangen en brengt hem naar kamer ${esc(d.room)}. Je betaalt bij ontvangst.</p>
+    <ul class="summary">${d.items.map(i => `<li><span>${i.q}× ${esc(i.name)}</span><span class="num">${eur(i.q * i.p)}</span></li>`).join("")}
+      <li class="tot"><span>Totaal</span><span class="num">${eur(d.total)}</span></li></ul>
+    <button class="btn block" id="again">Terug naar restaurants</button></div>`;
+}
+$("#g-done").addEventListener("click", e => { if(e.target.closest("#again")){ state.done = null; renderGuest(); } });
+$("#room").addEventListener("input", e => { e.target.value = e.target.value.replace(/[^0-9A-Za-z-]/g, ""); updateCart(); });
+
+/* ---------- Restaurant-dashboard ---------- */
+const FLOW = ["Nieuw","Geaccepteerd","Onderweg","Bezorgd"];
+const ACTION = {Nieuw:"Bestelling accepteren", Geaccepteerd:"Melden: onderweg", Onderweg:"Melden: bezorgd"};
+function renderRestView(){
+  const rid = state.auth && state.auth.restaurant_id, r = find(rid);
+  $("#rest-title").textContent = r ? r.name : "Bestellingen";
+  $("#rest-sync").textContent = "Ververst automatisch";
+  const all = state.orders.filter(o => o.restId === rid);
+  const groups = {Actief:all.filter(o => o.status !== "Bezorgd"), Bezorgd:all.filter(o => o.status === "Bezorgd"), Alle:all};
+  $("#chips").innerHTML = ["Actief","Bezorgd","Alle"].map(k =>
+    `<button class="chip" data-f="${k}" aria-pressed="${state.filter === k}">${k}<b>${groups[k].length}</b></button>`).join("");
+  const list = groups[state.filter];
+  $("#orders").innerHTML = list.length ? list.map(o => {
+    const step = FLOW.indexOf(o.status);
+    return `<article class="order">
+      <header><div><h3>Kamer ${esc(o.room)}</h3><span class="muted">${hhmm(o.t)}, ${ago(o.t)}</span></div><span class="pill s-${esc(o.status)}">${esc(o.status)}</span></header>
+      <ul class="lines">${o.items.map(i => `<li><span>${i.q}×</span><span>${esc(i.name)}</span><span class="num">${eur(i.q * i.p)}</span></li>`).join("")}</ul>
+      <div class="steps" aria-hidden="true">${FLOW.map((_, k) => `<i class="${k <= step ? "on" : ""}"></i>`).join("")}</div>
+      <footer><strong class="num">${eur(o.total)}</strong>${ACTION[o.status] ? `<button class="btn" data-id="${o.id}">${ACTION[o.status]}</button>` : ""}</footer>
+    </article>`;
+  }).join("") : `<div class="empty">Geen bestellingen in deze lijst. Nieuwe bestellingen verschijnen hier vanzelf.</div>`;
+}
+$("#chips").addEventListener("click", e => { const b = e.target.closest("[data-f]"); if(b){ state.filter = b.dataset.f; renderRestView(); } });
+$("#orders").addEventListener("click", async e => {
+  const b = e.target.closest("button[data-id]"); if(!b) return;
+  const o = state.orders.find(x => x.id == b.dataset.id), next = FLOW[FLOW.indexOf(o.status) + 1];
+  b.disabled = true;
+  try{ await sb("orders?id=eq." + o.id, {method:"PATCH", body:JSON.stringify({status:next})}); o.status = next; }
+  catch(err){ console.error(err); toast("Status bijwerken mislukt"); }
+  renderRestView();
 });
 
-/* Restaurant */
-const NEXT = {Nieuw:"Geaccepteerd",Geaccepteerd:"Onderweg",Onderweg:"Bezorgd"};
-function renderRestView(){
-  const sel=$("#restPick");
-  if(!sel.options.length){
-    sel.innerHTML = RESTAURANTS.filter(r=>r.method==="direct" && (!state.auth || r.id===state.auth.restaurant_id)).map(r=>`<option value="${r.id}">${r.name}</option>`).join("");
-    sel.onchange = renderRestView;
-  }
-  const list = state.orders.filter(o=>o.restId===sel.value);
-  $("#orders").innerHTML = list.length ? list.map(o=>`
-    <div class="order">
-      <div class="order-top"><strong>#${o.id} · Kamer ${o.room}</strong><span class="status ${o.status}">${o.status}</span></div>
-      <div>${o.items.map(i=>i.q+"× "+i.name).join(", ")}</div>
-      <div class="order-top"><span class="sub">${o.t.toLocaleTimeString("nl-NL",{hour:"2-digit",minute:"2-digit"})} · ${eur(o.total)}</span>
-        ${NEXT[o.status]?`<button class="btn" data-id="${o.id}">Markeer als ${NEXT[o.status].toLowerCase()}</button>`:""}</div>
-    </div>`).join("") : `<div class="empty">Nog geen bestellingen. Plaats er een als gast en kom terug.</div>`;
-  $("#orders").querySelectorAll("button").forEach(b=>b.addEventListener("click",async ()=>{
-    const o=state.orders.find(x=>x.id==b.dataset.id), next=NEXT[o.status];
-    try{
-      await sb("orders?id=eq."+o.id,{method:"PATCH",body:JSON.stringify({status:next})});
-      o.status=next; renderRestView();
-    }catch(e){console.error(e);toast("Status bijwerken mislukt")}
-  }));
-}
-
-/* Hotel */
+/* ---------- Hotel-overzicht ---------- */
 function renderHotel(){
-  const rev=state.orders.reduce((a,o)=>a+o.total,0), com=state.orders.reduce((a,o)=>a+o.com,0);
-  $("#s-orders").textContent=state.orders.length; $("#s-rev").textContent=eur(rev);
-  $("#s-com").textContent=eur(com); $("#s-ref").textContent=state.refs.length;
-  const rows=[
-    ...state.orders.map(o=>({t:o.t,room:o.room,rest:o.rest,m:"Direct",amt:eur(o.total),com:eur(o.com)})),
-    ...state.refs.map(r=>({t:r.t,room:r.room,rest:r.rest,m:"Via "+r.platform,amt:"–",com:"Nog onbekend"}))
-  ].sort((a,b)=>b.t-a.t);
-  $("#log").innerHTML = rows.length ? rows.map(r=>`<tr><td>${r.t.toLocaleTimeString("nl-NL",{hour:"2-digit",minute:"2-digit"})}</td><td>${r.room}</td><td>${r.rest}</td><td>${r.m}</td><td>${r.amt}</td><td>${r.com}</td></tr>`).join("")
-    : `<tr><td colspan="6" style="color:var(--muted)">Nog geen activiteit.</td></tr>`;
+  const os = state.orders, rev = os.reduce((a, o) => a + o.total, 0), com = os.reduce((a, o) => a + o.com, 0);
+  $("#hotel-sync").textContent = "Ververst automatisch";
+  $("#s-orders").textContent = os.length; $("#s-rev").textContent = eur(rev);
+  $("#s-com").textContent = eur(com); $("#s-avg").textContent = eur(os.length ? rev / os.length : 0);
+  const by = {}; os.forEach(o => { by[o.rest] = (by[o.rest] || 0) + o.com; });
+  const rows = Object.entries(by).sort((a, b) => b[1] - a[1]), max = rows.length ? rows[0][1] : 1;
+  $("#bars").innerHTML = rows.length ? rows.map(([n, v]) =>
+    `<div class="bar-row"><span>${esc(n)}</span><div class="bar-track"><div class="bar-fill" style="width:${max ? Math.max(4, v / max * 100) : 0}%"></div></div><span class="bar-val">${eur(v)}</span></div>`).join("")
+    : `<div class="muted">Nog geen bestellingen.</div>`;
+  $("#log").innerHTML = os.length ? os.slice(0, 25).map(o =>
+    `<tr><td>${hhmm(o.t)}</td><td>${esc(o.room)}</td><td>${esc(o.rest)}</td><td>${esc(o.status)}</td><td>${eur(o.total)}</td><td>${eur(o.com)}</td></tr>`).join("")
+    : `<tr><td colspan="6" class="muted">Nog geen bestellingen.</td></tr>`;
 }
 
-async function render(){
-  updateCart();
-  const need = state.view==="rest" ? "restaurant" : state.view==="hotel" ? "hotel" : null;
-  const ok = !need || (state.auth && state.auth.role===need);
-  $("#v-login").classList.toggle("hidden", ok);
-  if(need) $("#v-"+state.view).classList.toggle("hidden", !ok);
-  if(!ok){
-    $("#login-msg").textContent = state.auth
-      ? "Dit account heeft geen toegang tot dit tabblad. Log uit via de knop rechtsboven."
-      : "Log in als " + (need==="hotel" ? "hotel" : "restaurant") + " om verder te gaan.";
-    return;
-  }
-  if(state.view==="rest"){ await loadOrders(); renderRestView(); }
-  if(state.view==="hotel"){ await loadOrders(); renderHotel(); }
-}
+/* ---------- Start ---------- */
+$("#nav-guest").addEventListener("click", () => go("guest"));
+$("#nav-staff").addEventListener("click", () => go("login"));
+$("#nav-dash").addEventListener("click", () => go(state.auth.role === "hotel" ? "hotel" : "rest"));
+$("#logout").addEventListener("click", () => { logout(); toast("Uitgelogd"); });
 $("#l-go").addEventListener("click", login);
 $("#l-pw").addEventListener("keydown", e => { if(e.key === "Enter") login(); });
-$("#logout").addEventListener("click", () => { logout(); toast("Uitgelogd"); });
+setInterval(() => { if(state.auth && (state.view === "rest" || state.view === "hotel") && !document.hidden) refresh(); }, 15000);
+
 try{
   const k = new URLSearchParams(location.search).get("kamer");
-  if(k) $("#room").value = k.replace(/[^0-9A-Za-z-]/g,"").slice(0,4);
+  if(k) $("#room").value = k.replace(/[^0-9A-Za-z-]/g, "").slice(0, 4);
 }catch(e){}
+go("guest");
 renderRests();
 loadData();
 </script>
