@@ -3,6 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Maashaven">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <title>Hotel Maashaven – Bestel uit de buurt</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://veggbrabijaqdlomwtkg.supabase.co" crossorigin>
@@ -224,6 +231,16 @@ tr:last-child td{border-bottom:0}
 .toast{position:fixed;width:max-content;left:50%;top:76px;transform:translateX(-50%);background:var(--btn);color:var(--btn-ink);padding:11px 20px;border-radius:999px;font-weight:600;display:none;z-index:40;box-shadow:var(--shadow);max-width:92vw}
 .toast.show{display:block}
 
+/* ---------- App-gevoel ---------- */
+html{-webkit-text-size-adjust:100%}
+body{-webkit-tap-highlight-color:transparent;overscroll-behavior-y:none}
+button,.chip,.cat,.rest,.link,.btn,label.upl-btn{touch-action:manipulation;-webkit-user-select:none;user-select:none}
+.bar{padding-top:env(safe-area-inset-top,0px)}
+.bar-in{padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+.menu-nav{top:calc(64px + env(safe-area-inset-top,0px)) !important}
+.install{display:inline-grid;place-items:center;width:38px;height:38px;padding:0 !important;border-radius:50%}
+html.standalone #nav-install{display:none !important}
+
 /* ---------- Soepele beweging ---------- */
 html{scroll-behavior:smooth;scrollbar-gutter:stable}
 .btn,.chip,.link,.cat,.add,.ctl button,.cartbtn,.round,.x,.lang button,.rest,.textbtn{transition:background-color .2s,color .2s,transform .14s,filter .2s,opacity .2s,outline-color .2s}
@@ -264,6 +281,7 @@ html{scroll-behavior:smooth;scrollbar-gutter:stable}
       <div class="lang" id="lang" role="group" aria-label="Language"><button data-l="nl">NL</button><button data-l="en">EN</button><button data-l="de">DE</button></div>
       <button class="link" id="nav-guest">Gastapp</button>
       <button class="link" id="nav-dash">Dashboard</button>
+      <button class="link install hidden" id="nav-install" data-i18n-aria="install" aria-label="Installeer app"></button>
       <button class="link" id="nav-staff" data-i18n="staff">Personeel</button>
       <button class="link" id="logout">Uitloggen</button>
     </nav>
@@ -364,6 +382,8 @@ html{scroll-behavior:smooth;scrollbar-gutter:stable}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
 const BASE_TITLE = document.title;
+let installEvt = null, standalone = false;
+const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
 const HOTEL_POS = [51.8975, 4.4840]; // pas aan naar de echte locatie van het hotel (breedtegraad, lengtegraad)
 const HOTEL = "Hotel Maashaven, Maashaven Zuidzijde 1, Rotterdam";
 const $ = s => document.querySelector(s);
@@ -393,9 +413,9 @@ const FALLBACK = [
 ];
 
 const T = {
-nl:{staff:"Personeel",deliverTo:"Bezorgen naar kamer",search:"Zoek restaurants",feedTitle:"Bezorging op je kamer",viewCart:"Bekijk winkelmand",cart:"Winkelmand",close:"Sluiten",copyHint:"Kopieer het adres en plak het bij het afrekenen.",goOrder:"Ga naar bestellen",copyAddr:"Kopieer adres",cancel:"Annuleren",all:"Alles",closed:"Gesloten",orderDirect:"Bestel direct",via:"Via {p}",opensAt:"Opent om {t}",noResults:"Geen restaurants gevonden. Probeer een andere zoekterm of categorie.",needRoom:"Vul eerst je kamernummer in",closedToast:"{n} is nu gesloten. {o}",opensTomorrow:"Opent morgen om {t}",opensDay:"Opent {d} om {t}",noItems:"Dit restaurant heeft nog geen gerechten beschikbaar.",addonOnly:"Alleen in combinatie met een hoofdgerecht",addonNote:"Voeg eerst een pizza of ander hoofdgerecht toe. Deze producten kun je alleen daarbij bestellen.",continueTo:"Verder naar {p}",orderingVia:"Je bestelt bij {r} via {p}. Bezorgadres:",room:"kamer",copied:"Adres gekopieerd",copyFail:"Kopiëren lukt niet, selecteer het adres zelf",backToRests:"Terug naar restaurants",freeDelivery:"Gratis bezorging op je kamer",deliveryTo:"Bezorging naar kamer {r}",change:"Wijzig",inCart:"{q} in mand",less:"Minder {n}",more:"Meer {n}",addItem:"Voeg {n} toe",total:"Totaal",deliveryInfo:"Bezorging naar {h}, kamer {r}. Je betaalt bij ontvangst.",orderFor:"Bestel voor {a}",orderFail:"Bestellen mislukt, probeer opnieuw",dbFail:"Database niet bereikbaar, voorbeelddata getoond",payOnReceipt:"Je betaalt bij ontvangst.",stNieuw:"Bestelling ontvangen",stGeaccepteerd:"Het restaurant maakt je bestelling klaar",stOnderweg:"Je bestelling is onderweg",stBezorgd:"Bezorgd, eet smakelijk!",trk0:"Ontvangen",trk1:"Wordt bereid",trk2:"Onderweg",trk3:"Bezorgd",progress:"Voortgang",orderMore:"Nog iets bestellen",trackSoon:"Zodra de bezorger onderweg is, kun je hem hier live volgen.",trackWait:"Wachten op de locatie van de bezorger…",trackDist:"De bezorger is ongeveer {d} van het hotel",trackStale:"Laatst bijgewerkt om {t}",mapAria:"Kaart met de locatie van de bezorger"},
-en:{staff:"Staff",deliverTo:"Deliver to room",search:"Search restaurants",feedTitle:"Delivered to your room",viewCart:"View basket",cart:"Basket",close:"Close",copyHint:"Copy the address and paste it at checkout.",goOrder:"Continue to order",copyAddr:"Copy address",cancel:"Cancel",all:"All",closed:"Closed",orderDirect:"Order direct",via:"Via {p}",opensAt:"Opens at {t}",noResults:"No restaurants found. Try another search or category.",needRoom:"Enter your room number first",closedToast:"{n} is closed right now. {o}",opensTomorrow:"Opens tomorrow at {t}",opensDay:"Opens {d} at {t}",noItems:"This restaurant has no dishes available yet.",addonOnly:"Only together with a main dish",addonNote:"Add a pizza or another main dish first. These items can only be ordered together with one.",continueTo:"Continue to {p}",orderingVia:"You’re ordering from {r} via {p}. Delivery address:",room:"room",copied:"Address copied",copyFail:"Copy failed, select the address manually",backToRests:"Back to restaurants",freeDelivery:"Free delivery to your room",deliveryTo:"Delivery to room {r}",change:"Change",inCart:"{q} in basket",less:"Remove one {n}",more:"Add one more {n}",addItem:"Add {n}",total:"Total",deliveryInfo:"Delivery to {h}, room {r}. You pay on receipt.",orderFor:"Order for {a}",orderFail:"Order failed, please try again",dbFail:"Database unreachable, showing sample data",payOnReceipt:"You pay on receipt.",stNieuw:"Order received",stGeaccepteerd:"The restaurant is preparing your order",stOnderweg:"Your order is on its way",stBezorgd:"Delivered, enjoy your meal!",trk0:"Received",trk1:"Preparing",trk2:"On its way",trk3:"Delivered",progress:"Progress",orderMore:"Order something else",trackSoon:"Once the courier is on the way, you can follow them live here.",trackWait:"Waiting for the courier’s location…",trackDist:"The courier is about {d} from the hotel",trackStale:"Last updated at {t}",mapAria:"Map showing the courier’s location"},
-de:{staff:"Personal",deliverTo:"Lieferung an Zimmer",search:"Restaurants suchen",feedTitle:"Lieferung auf dein Zimmer",viewCart:"Warenkorb ansehen",cart:"Warenkorb",close:"Schließen",copyHint:"Kopiere die Adresse und füge sie beim Bezahlen ein.",goOrder:"Weiter zur Bestellung",copyAddr:"Adresse kopieren",cancel:"Abbrechen",all:"Alle",closed:"Geschlossen",orderDirect:"Direkt bestellen",via:"Über {p}",opensAt:"Öffnet um {t}",noResults:"Keine Restaurants gefunden. Versuche eine andere Suche oder Kategorie.",needRoom:"Gib zuerst deine Zimmernummer ein",closedToast:"{n} ist gerade geschlossen. {o}",opensTomorrow:"Öffnet morgen um {t}",opensDay:"Öffnet {d} um {t}",noItems:"Dieses Restaurant hat noch keine Gerichte verfügbar.",addonOnly:"Nur in Kombination mit einem Hauptgericht",addonNote:"Füge zuerst eine Pizza oder ein anderes Hauptgericht hinzu. Diese Artikel gibt es nur dazu.",continueTo:"Weiter zu {p}",orderingVia:"Du bestellst bei {r} über {p}. Lieferadresse:",room:"Zimmer",copied:"Adresse kopiert",copyFail:"Kopieren fehlgeschlagen, markiere die Adresse selbst",backToRests:"Zurück zu den Restaurants",freeDelivery:"Kostenlose Lieferung auf dein Zimmer",deliveryTo:"Lieferung an Zimmer {r}",change:"Ändern",inCart:"{q} im Warenkorb",less:"Weniger {n}",more:"Mehr {n}",addItem:"{n} hinzufügen",total:"Gesamt",deliveryInfo:"Lieferung an {h}, Zimmer {r}. Du zahlst bei Erhalt.",orderFor:"Bestellen für {a}",orderFail:"Bestellung fehlgeschlagen, bitte erneut versuchen",dbFail:"Datenbank nicht erreichbar, Beispieldaten werden gezeigt",payOnReceipt:"Du zahlst bei Erhalt.",stNieuw:"Bestellung erhalten",stGeaccepteerd:"Das Restaurant bereitet deine Bestellung zu",stOnderweg:"Deine Bestellung ist unterwegs",stBezorgd:"Geliefert, guten Appetit!",trk0:"Erhalten",trk1:"Wird zubereitet",trk2:"Unterwegs",trk3:"Geliefert",progress:"Fortschritt",orderMore:"Noch etwas bestellen",trackSoon:"Sobald der Fahrer unterwegs ist, kannst du ihn hier live verfolgen.",trackWait:"Warte auf den Standort des Fahrers…",trackDist:"Der Fahrer ist etwa {d} vom Hotel entfernt",trackStale:"Zuletzt aktualisiert um {t}",mapAria:"Karte mit dem Standort des Fahrers"}
+nl:{staff:"Personeel",deliverTo:"Bezorgen naar kamer",search:"Zoek restaurants",feedTitle:"Bezorging op je kamer",viewCart:"Bekijk winkelmand",cart:"Winkelmand",close:"Sluiten",copyHint:"Kopieer het adres en plak het bij het afrekenen.",goOrder:"Ga naar bestellen",copyAddr:"Kopieer adres",cancel:"Annuleren",all:"Alles",closed:"Gesloten",orderDirect:"Bestel direct",via:"Via {p}",opensAt:"Opent om {t}",noResults:"Geen restaurants gevonden. Probeer een andere zoekterm of categorie.",needRoom:"Vul eerst je kamernummer in",closedToast:"{n} is nu gesloten. {o}",opensTomorrow:"Opent morgen om {t}",opensDay:"Opent {d} om {t}",noItems:"Dit restaurant heeft nog geen gerechten beschikbaar.",install:"Installeer app",iosInstall:"Tik op Deel en kies ‘Zet op beginscherm’.",viewOnlyTag:"Alleen menu",viewOnlySub:"Bestellen nog niet mogelijk",viewOnlyBanner:"Je kunt het menu alvast bekijken. Bestellen bij dit restaurant is nog niet mogelijk.",closedBanner:"Dit restaurant is nu gesloten. {o} Je kunt het menu alvast bekijken.",addonOnly:"Alleen in combinatie met een hoofdgerecht",addonNote:"Voeg eerst een pizza of ander hoofdgerecht toe. Deze producten kun je alleen daarbij bestellen.",continueTo:"Verder naar {p}",orderingVia:"Je bestelt bij {r} via {p}. Bezorgadres:",room:"kamer",copied:"Adres gekopieerd",copyFail:"Kopiëren lukt niet, selecteer het adres zelf",backToRests:"Terug naar restaurants",freeDelivery:"Gratis bezorging op je kamer",deliveryTo:"Bezorging naar kamer {r}",change:"Wijzig",inCart:"{q} in mand",less:"Minder {n}",more:"Meer {n}",addItem:"Voeg {n} toe",total:"Totaal",deliveryInfo:"Bezorging naar {h}, kamer {r}. Je betaalt bij ontvangst.",orderFor:"Bestel voor {a}",orderFail:"Bestellen mislukt, probeer opnieuw",dbFail:"Database niet bereikbaar, voorbeelddata getoond",payOnReceipt:"Je betaalt bij ontvangst.",stNieuw:"Bestelling ontvangen",stGeaccepteerd:"Het restaurant maakt je bestelling klaar",stOnderweg:"Je bestelling is onderweg",stBezorgd:"Bezorgd, eet smakelijk!",trk0:"Ontvangen",trk1:"Wordt bereid",trk2:"Onderweg",trk3:"Bezorgd",progress:"Voortgang",orderMore:"Nog iets bestellen",trackSoon:"Zodra de bezorger onderweg is, kun je hem hier live volgen.",trackWait:"Wachten op de locatie van de bezorger…",trackDist:"De bezorger is ongeveer {d} van het hotel",trackStale:"Laatst bijgewerkt om {t}",mapAria:"Kaart met de locatie van de bezorger"},
+en:{staff:"Staff",deliverTo:"Deliver to room",search:"Search restaurants",feedTitle:"Delivered to your room",viewCart:"View basket",cart:"Basket",close:"Close",copyHint:"Copy the address and paste it at checkout.",goOrder:"Continue to order",copyAddr:"Copy address",cancel:"Cancel",all:"All",closed:"Closed",orderDirect:"Order direct",via:"Via {p}",opensAt:"Opens at {t}",noResults:"No restaurants found. Try another search or category.",needRoom:"Enter your room number first",closedToast:"{n} is closed right now. {o}",opensTomorrow:"Opens tomorrow at {t}",opensDay:"Opens {d} at {t}",noItems:"This restaurant has no dishes available yet.",install:"Install app",iosInstall:"Tap Share, then ‘Add to Home Screen’.",viewOnlyTag:"Menu only",viewOnlySub:"Ordering not available yet",viewOnlyBanner:"You can browse the menu. Ordering from this restaurant isn’t available yet.",closedBanner:"This restaurant is closed right now. {o} You can already browse the menu.",addonOnly:"Only together with a main dish",addonNote:"Add a pizza or another main dish first. These items can only be ordered together with one.",continueTo:"Continue to {p}",orderingVia:"You’re ordering from {r} via {p}. Delivery address:",room:"room",copied:"Address copied",copyFail:"Copy failed, select the address manually",backToRests:"Back to restaurants",freeDelivery:"Free delivery to your room",deliveryTo:"Delivery to room {r}",change:"Change",inCart:"{q} in basket",less:"Remove one {n}",more:"Add one more {n}",addItem:"Add {n}",total:"Total",deliveryInfo:"Delivery to {h}, room {r}. You pay on receipt.",orderFor:"Order for {a}",orderFail:"Order failed, please try again",dbFail:"Database unreachable, showing sample data",payOnReceipt:"You pay on receipt.",stNieuw:"Order received",stGeaccepteerd:"The restaurant is preparing your order",stOnderweg:"Your order is on its way",stBezorgd:"Delivered, enjoy your meal!",trk0:"Received",trk1:"Preparing",trk2:"On its way",trk3:"Delivered",progress:"Progress",orderMore:"Order something else",trackSoon:"Once the courier is on the way, you can follow them live here.",trackWait:"Waiting for the courier’s location…",trackDist:"The courier is about {d} from the hotel",trackStale:"Last updated at {t}",mapAria:"Map showing the courier’s location"},
+de:{staff:"Personal",deliverTo:"Lieferung an Zimmer",search:"Restaurants suchen",feedTitle:"Lieferung auf dein Zimmer",viewCart:"Warenkorb ansehen",cart:"Warenkorb",close:"Schließen",copyHint:"Kopiere die Adresse und füge sie beim Bezahlen ein.",goOrder:"Weiter zur Bestellung",copyAddr:"Adresse kopieren",cancel:"Abbrechen",all:"Alle",closed:"Geschlossen",orderDirect:"Direkt bestellen",via:"Über {p}",opensAt:"Öffnet um {t}",noResults:"Keine Restaurants gefunden. Versuche eine andere Suche oder Kategorie.",needRoom:"Gib zuerst deine Zimmernummer ein",closedToast:"{n} ist gerade geschlossen. {o}",opensTomorrow:"Öffnet morgen um {t}",opensDay:"Öffnet {d} um {t}",noItems:"Dieses Restaurant hat noch keine Gerichte verfügbar.",install:"App installieren",iosInstall:"Tippe auf Teilen und wähle ‘Zum Home-Bildschirm’.",viewOnlyTag:"Nur Speisekarte",viewOnlySub:"Bestellen noch nicht möglich",viewOnlyBanner:"Du kannst die Speisekarte ansehen. Bestellen ist bei diesem Restaurant noch nicht möglich.",closedBanner:"Dieses Restaurant ist gerade geschlossen. {o} Du kannst die Speisekarte schon ansehen.",addonOnly:"Nur in Kombination mit einem Hauptgericht",addonNote:"Füge zuerst eine Pizza oder ein anderes Hauptgericht hinzu. Diese Artikel gibt es nur dazu.",continueTo:"Weiter zu {p}",orderingVia:"Du bestellst bei {r} über {p}. Lieferadresse:",room:"Zimmer",copied:"Adresse kopiert",copyFail:"Kopieren fehlgeschlagen, markiere die Adresse selbst",backToRests:"Zurück zu den Restaurants",freeDelivery:"Kostenlose Lieferung auf dein Zimmer",deliveryTo:"Lieferung an Zimmer {r}",change:"Ändern",inCart:"{q} im Warenkorb",less:"Weniger {n}",more:"Mehr {n}",addItem:"{n} hinzufügen",total:"Gesamt",deliveryInfo:"Lieferung an {h}, Zimmer {r}. Du zahlst bei Erhalt.",orderFor:"Bestellen für {a}",orderFail:"Bestellung fehlgeschlagen, bitte erneut versuchen",dbFail:"Datenbank nicht erreichbar, Beispieldaten werden gezeigt",payOnReceipt:"Du zahlst bei Erhalt.",stNieuw:"Bestellung erhalten",stGeaccepteerd:"Das Restaurant bereitet deine Bestellung zu",stOnderweg:"Deine Bestellung ist unterwegs",stBezorgd:"Geliefert, guten Appetit!",trk0:"Erhalten",trk1:"Wird zubereitet",trk2:"Unterwegs",trk3:"Geliefert",progress:"Fortschritt",orderMore:"Noch etwas bestellen",trackSoon:"Sobald der Fahrer unterwegs ist, kannst du ihn hier live verfolgen.",trackWait:"Warte auf den Standort des Fahrers…",trackDist:"Der Fahrer ist etwa {d} vom Hotel entfernt",trackStale:"Zuletzt aktualisiert um {t}",mapAria:"Karte mit dem Standort des Fahrers"}
 };
 const KIND_TR = {Kip:{en:"Chicken", de:"Hähnchen"}, Chinees:{en:"Chinese", de:"Chinesisch"}, Italiaans:{en:"Italian", de:"Italienisch"}};
 const DAYS = {nl:["zondag","maandag","dinsdag","woensdag","donderdag","vrijdag","zaterdag"], en:["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"], de:["Sonntag","Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag"]};
@@ -503,7 +523,7 @@ async function loadData(){
     RESTAURANTS = rs.map(r => {
       const f = FALLBACK.find(x => x.id === r.id) || {};
       return {id:r.id, name:r.name, kind:r.kind, time:f.time || "30–40 min", color:f.color || "#3d4a5c",
-        method:r.method, platform:r.platform, url:r.url, rate:Number(r.rate), opens:r.opens, closes:r.closes, tracking:!!r.tracking, image:r.image_url || "", hours:r.hours || null,
+        method:r.method, platform:r.platform, url:r.url, rate:Number(r.rate), opens:r.opens, closes:r.closes, tracking:!!r.tracking, orderable:r.orderable !== false, image:r.image_url || "", hours:r.hours || null,
         menu: ms.filter(m => m.restaurant_id === r.id).map(m => [m.name, m.price == null ? null : Number(m.price), m.image_url || "", m.id, m.category || "", m.description || "", m.available !== false, m.addon === true])};
     });
     try{ localStorage.setItem("catalog", JSON.stringify(RESTAURANTS)); }catch(e){}
@@ -546,15 +566,34 @@ async function login(){
 }
 function logout(){ stopShare(); state.restTab = "orders"; state.menuDrawn = false; state.auth = null; state.orders = []; state.seen = null; document.title = BASE_TITLE; go("guest"); }
 
+/* ---------- Terugknop zoals in een app ---------- */
+const stack = [];
+function pushLayer(n){ stack.push(n); history.pushState({n:stack.length}, ""); }
+function popLayer(n){ if(stack[stack.length - 1] === n) history.back(); else closeLayer(n); }
+function closeLayer(n){
+  if(n === "menu"){ state.open = null; state.cart = {}; state.done = null; closeSheet($("#csheet")); renderGuest(); }
+  else if(n === "view"){ go("guest", {fromPop:true}); }
+}
+window.addEventListener("popstate", e => {
+  const n = (e.state && e.state.n) || 0;
+  while(stack.length > n) closeLayer(stack.pop());
+});
+try{ history.replaceState({n:0}, ""); }catch(e){}
+
 /* ---------- Navigatie ---------- */
 const ROLE_VIEW = {restaurant:"rest", hotel:"hotel", reception:"recep"};
 const VIEW_ROLE = {rest:"restaurant", hotel:"hotel", recep:"reception"};
-function go(v){
+function go(v, o){
   if(VIEW_ROLE[v] && !(state.auth && state.auth.role === VIEW_ROLE[v])) v = "login";
+  if(!(o && o.fromPop)){
+    if(v === "guest" && stack[stack.length - 1] === "view"){ history.back(); return; }
+    if(v !== "guest" && state.view === "guest") pushLayer("view");
+  }
   state.view = v;
   ["guest","login","rest","hotel","recep"].forEach(x => $("#v-" + x).classList.toggle("hidden", x !== v));
   $("#nav-guest").classList.toggle("hidden", v === "guest");
   $("#lang").classList.toggle("hidden", v !== "guest");
+  $("#nav-install").classList.toggle("hidden", v !== "guest" || !(installEvt || (isIOS && !standalone)));
   $("#nav-dash").classList.toggle("hidden", !(state.auth && v === "guest"));
   $("#nav-staff").classList.toggle("hidden", !(!state.auth && v === "guest"));
   $("#logout").classList.toggle("hidden", !state.auth);
@@ -603,6 +642,7 @@ function openText(r){
   }
   return r.opens ? t("opensAt", {t:hm(r.opens)}) : "";
 }
+const canOrder = r => r.orderable !== false && isOpen(r);
 const KIND_EMOJI = {Burgers:"🍔", Kip:"🍗", Pizza:"🍕", Snacks:"🍟", Chinees:"🥡", Italiaans:"🍝"};
 const CAT_EMOJI = [[/ben & jerry|magnum/i,"🍦"],[/dranken/i,"🥤"],[/sausjes/i,"🥫"],[/bread/i,"🥖"],[/salad/i,"🥗"],[/calzone/i,"🍕"],[/veggie sides/i,"🧀"],[/chicken sides/i,"🍗"],[/pizza/i,"🍕"],[/pasta|risotto|gnocchi/i,"🍝"],[/antipasti/i,"🥗"],[/vis/i,"🐟"],[/vlees/i,"🥩"],[/dessert/i,"🍰"],[/bijgerecht/i,"🥔"]];
 const ITEM_EMOJI = [[/tiramisu/i,"🍰"],[/pizza|margherita|pepperoni|quattro/i,"🍕"],[/friet/i,"🍟"],[/frikandel/i,"🌭"],[/kapsalon/i,"🥙"],[/kroket/i,"🧆"],[/babi|pangang/i,"🍖"],[/nasi/i,"🍛"],[/loempia/i,"🥟"],[/bami/i,"🍜"],[/burger/i,"🍔"],[/kip|chicken/i,"🍗"]];
@@ -625,21 +665,21 @@ function renderRests(){
   renderCats();
   el.classList.toggle("stagger", !state.animated); state.animated = true;
   const list = RESTAURANTS.filter(r => (state.cat === "Alles" || r.kind === state.cat) && (!state.q || (r.name + " " + r.kind).toLowerCase().includes(state.q)));
-  el.innerHTML = list.length ? list.map((r, ix) => { const open = isOpen(r); return `
+  el.innerHTML = list.length ? list.map((r, ix) => { const view = r.orderable === false, open = isOpen(r) || view; return `
     <button class="rest${open ? "" : " closed"}" style="--i:${ix}" data-id="${esc(r.id)}">
       <div class="cover" style="background:${tint(r.color)}" aria-hidden="true">${kindEmoji(r.kind)}${imgTag(r.image)}
-        ${!open ? `<span class="tag closed">${t("closed")}</span>` : r.method === "direct" ? `<span class="tag direct">${I.check}${t("orderDirect")}</span>` : `<span class="tag">${I.ext}${esc(t("via", {p:r.platform}))}</span>`}
+        ${view ? `<span class="tag">${t("viewOnlyTag")}</span>` : !open ? `<span class="tag closed">${t("closed")}</span>` : r.method === "direct" ? `<span class="tag direct">${I.check}${t("orderDirect")}</span>` : `<span class="tag">${I.ext}${esc(t("via", {p:r.platform}))}</span>`}
       </div>
       <div class="rest-row"><span class="rest-name">${esc(r.name)}</span><span class="time num">${esc(r.time)}</span></div>
-      <div class="rest-sub">${open ? esc(tk(r.kind)) : esc(openText(r))}</div>
+      <div class="rest-sub">${view ? esc(t("viewOnlySub")) : open ? esc(tk(r.kind)) : esc(openText(r))}</div>
     </button>`; }).join("") : `<div class="empty">${t("noResults")}</div>`;
 }
 $("#rests").addEventListener("click", e => { const b = e.target.closest("button.rest"); if(b) pick(b.dataset.id); });
 
 function pick(id){
   const r = find(id);
-  if(!isOpen(r)){ toast(t("closedToast", {n:r.name, o:openText(r)})); return; }
-  if(!room()){ toast(t("needRoom")); $("#room").focus(); return; }
+  if(r.method === "refer" && !isOpen(r)){ toast(t("closedToast", {n:r.name, o:openText(r)})); return; }
+  if((r.method === "refer" || canOrder(r)) && !room()){ toast(t("needRoom")); $("#room").focus(); return; }
   if(r.method === "refer"){
     state.pending = r;
     $("#m-title").textContent = t("continueTo", {p:r.platform});
@@ -649,6 +689,7 @@ function pick(id){
     return;
   }
   state.open = id; state.cart = {}; state.done = null;
+  if(stack[stack.length - 1] !== "menu") pushLayer("menu");
   renderGuest(); window.scrollTo(0, 0);
 }
 $("#m-close").addEventListener("click", () => closeSheet($("#modal")));
@@ -677,7 +718,9 @@ function renderMenu(r){
       <button class="round" id="back" aria-label="${esc(t("backToRests"))}">${I.back}</button></div>
     <h1 class="store">${esc(r.name)}</h1>
     <div class="meta"><span>${esc(tk(r.kind))}</span><span>${esc(r.time)}</span><span>${t("freeDelivery")}</span></div>
-    <div class="deliv"><span>${t("deliveryTo", {r:"<b>" + esc(room()) + "</b>"})}</span><button class="textbtn" id="chg">${t("change")}</button></div>
+    ${canOrder(r)
+      ? `<div class="deliv"><span>${t("deliveryTo", {r:"<b>" + esc(room()) + "</b>"})}</span><button class="textbtn" id="chg">${t("change")}</button></div>`
+      : `<div class="info" style="margin:16px 0 4px">${r.orderable === false ? t("viewOnlyBanner") : t("closedBanner", {o:esc(openText(r))})}</div>`}
     <div class="menu-nav" id="menu-nav"></div><div id="items"></div>`;
   renderItems(r, true);
 }
@@ -686,9 +729,9 @@ function itemHtml(r, m, i){
   return `<li class="item">
       <div class="item-main"><span class="item-name">${n}</span><span class="item-price">${eur(m[1])}</span>${m[5] ? `<span class="item-desc">${esc(m[5])}</span>` : ""}${q ? `<span class="item-count">${t("inCart", {q})}</span>` : ""}</div>
       <div class="thumb" style="background:${tint(r.color, 14, 30)}" aria-hidden="true">${itemEmoji(m[0], r.kind, m[4])}${imgTag(m[2])}
-        <div class="ctl">${q
+        ${canOrder(r) ? `<div class="ctl">${q
           ? `<button data-i="${i}" data-d="-1" aria-label="${t("less", {n})}">${I.minus}</button><output>${q}</output><button data-i="${i}" data-d="1" aria-label="${t("more", {n})}">${I.plus}</button>`
-          : `<button data-i="${i}" data-d="1" aria-label="${t("addItem", {n})}">${I.plus}</button>`}</div>
+          : `<button data-i="${i}" data-d="1" aria-label="${t("addItem", {n})}">${I.plus}</button>`}</div>` : ""}
       </div></li>`;
 }
 function renderItems(r, withNav){
@@ -702,8 +745,8 @@ function renderItems(r, withNav){
 }
 $("#g-menu").addEventListener("click", e => {
   const r = state.open ? find(state.open) : null; if(!r) return;
-  if(e.target.closest("#back")){ state.open = null; state.cart = {}; renderGuest(); return; }
-  if(e.target.closest("#chg")){ state.open = null; state.cart = {}; renderGuest(); $("#room").focus(); return; }
+  if(e.target.closest("#back")){ popLayer("menu"); return; }
+  if(e.target.closest("#chg")){ popLayer("menu"); setTimeout(() => $("#room").focus(), 50); return; }
   const go2 = e.target.closest("[data-go]");
   if(go2){ const el = document.getElementById(go2.dataset.go); if(el) el.scrollIntoView({behavior:"smooth", block:"start"}); return; }
   const b = e.target.closest("button[data-d]"); if(!b) return;
@@ -711,6 +754,7 @@ $("#g-menu").addEventListener("click", e => {
   renderItems(r); updateCart();
   const hit = document.querySelector('#items [data-i="' + i + '"]'), out = hit && hit.closest(".ctl") && hit.closest(".ctl").querySelector("output");
   if(out) out.classList.add("bump");
+  if(navigator.vibrate) navigator.vibrate(8);
 });
 
 function cartTotals(){
@@ -744,6 +788,7 @@ $("#csheet").addEventListener("click", e => { if(e.target.id === "csheet") close
 
 $("#place").addEventListener("click", async () => {
   const r = find(state.open), c = cartTotals();
+  if(!canOrder(r)) return;
   if(!room()){ toast(t("needRoom")); return; }
   if(c.onlyAddons){ toast(t("addonNote")); return; }
   const btn = $("#place"); btn.disabled = true; btn.classList.add("loading");
@@ -790,7 +835,7 @@ async function pollStatus(){
     if(changed){ saveOrder(d); renderDone(); updateMap(true); } else updateMap(false);
   }catch(e){ console.error(e); }
 }
-$("#g-done").addEventListener("click", e => { if(e.target.closest("#again")){ if(state.done && state.done.status === "Bezorgd") clearOrder(); state.done = null; renderGuest(); } });
+$("#g-done").addEventListener("click", e => { if(e.target.closest("#again")){ if(state.done && state.done.status === "Bezorgd") clearOrder(); popLayer("menu"); } });
 $("#room").addEventListener("input", e => { e.target.value = e.target.value.replace(/[^0-9A-Za-z-]/g, ""); });
 
 /* ---------- Restaurant-dashboard ---------- */
@@ -843,10 +888,9 @@ $("#orders").addEventListener("click", async e => {
   if(sh){ const id = +sh.dataset.share; if(shareOrder === id) stopShare(); else startShare(id); renderRestView(); return; }
   const b = e.target.closest("button[data-id]"); if(!b) return;
   const o = state.orders.find(x => x.id == b.dataset.id), next = FLOW[FLOW.indexOf(o.status) + 1];
-  b.disabled = true;
-  try{ await sb("orders?id=eq." + o.id, {method:"PATCH", body:JSON.stringify(next === "Bezorgd" ? {status:next, courier_lat:null, courier_lng:null, courier_at:null} : {status:next})}); o.status = next; if(next === "Bezorgd" && shareOrder === o.id) stopShare(); }
-  catch(err){ console.error(err); toast("Status bijwerken mislukt"); }
-  renderRestView();
+  const prev = o.status; o.status = next; renderRestView();
+  try{ await sb("orders?id=eq." + o.id, {method:"PATCH", body:JSON.stringify(next === "Bezorgd" ? {status:next, courier_lat:null, courier_lng:null, courier_at:null} : {status:next})}); if(next === "Bezorgd" && shareOrder === o.id){ stopShare(); renderRestView(); } }
+  catch(err){ console.error(err); o.status = prev; toast("Status bijwerken mislukt"); renderRestView(); }
 });
 
 /* ---------- Menu en foto's (restaurant) ---------- */
@@ -962,6 +1006,18 @@ $("#nav-staff").addEventListener("click", () => go("login"));
 $("#nav-dash").addEventListener("click", () => go(ROLE_VIEW[state.auth.role]));
 $("#logout").addEventListener("click", () => { logout(); toast("Uitgelogd"); });
 $("#lang").addEventListener("click", e => { const b = e.target.closest("[data-l]"); if(b) setLang(b.dataset.l); });
+standalone = window.matchMedia("(display-mode: standalone)").matches || !!navigator.standalone;
+if(standalone) document.documentElement.classList.add("standalone");
+$("#nav-install").innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></svg>';
+window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); installEvt = e; if(!standalone && state.view === "guest") $("#nav-install").classList.remove("hidden"); });
+if(isIOS && !standalone) $("#nav-install").classList.remove("hidden");
+$("#nav-install").addEventListener("click", async () => {
+  if(installEvt){ installEvt.prompt(); try{ await installEvt.userChoice; }catch(e){} installEvt = null; $("#nav-install").classList.add("hidden"); }
+  else toast(t("iosInstall"));
+});
+if("serviceWorker" in navigator && location.protocol.indexOf("http") === 0){
+  window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(console.error));
+}
 $("#l-go").addEventListener("click", login);
 $("#l-pw").addEventListener("keydown", e => { if(e.key === "Enter") login(); });
 setInterval(() => { if(state.auth && (state.view === "rest" || state.view === "hotel" || state.view === "recep") && !document.hidden) refresh(); }, 8000);
