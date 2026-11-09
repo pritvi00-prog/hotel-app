@@ -109,7 +109,7 @@ svg{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-width:
 .empty{border:1.5px dashed var(--line);border-radius:12px;padding:36px 20px;text-align:center;color:var(--muted);grid-column:1/-1}
 
 /* Winkelpagina */
-.banner{position:relative;height:200px;border-radius:12px;display:grid;place-items:center;font-size:5.5rem;overflow:hidden}
+.banner{position:relative;height:clamp(170px,26vw,280px);border-radius:12px;display:grid;place-items:center;font-size:5.5rem;overflow:hidden}
 .round{z-index:1;position:absolute;left:14px;top:14px;width:42px;height:42px;border-radius:50%;border:0;background:var(--bg);color:var(--ink);display:grid;place-items:center;box-shadow:var(--shadow)}
 .store{font-size:2.1rem;font-weight:800;margin:18px 0 6px}
 .meta{display:flex;gap:16px;flex-wrap:wrap;color:var(--muted);font-size:.95rem}
@@ -166,6 +166,12 @@ svg{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-width:
 .upl-row+.upl-row{border-top:1px solid var(--line)}
 .grow{flex:1;min-width:0}
 .upl-img{position:relative;width:64px;height:64px;border-radius:12px;overflow:hidden;display:grid;place-items:center;font-size:1.8rem;flex:none}
+.cov{display:grid;gap:12px;padding:14px 0}
+.cov+.cov{border-top:1px solid var(--line)}
+.cov-img{position:relative;width:100%;max-width:420px;border-radius:12px;overflow:hidden;display:grid;place-items:center;font-size:2.2rem}
+.cov-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.cov-text{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.cov-text>div{flex:1;min-width:200px}
 .upl-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .upl-btn{cursor:pointer;padding:10px 16px}
 .map{position:relative;z-index:0;isolation:isolate;width:100%;height:280px;border-radius:12px;overflow:hidden;border:1px solid var(--line)}
@@ -523,7 +529,7 @@ async function loadData(){
     RESTAURANTS = rs.map(r => {
       const f = FALLBACK.find(x => x.id === r.id) || {};
       return {id:r.id, name:r.name, kind:r.kind, time:f.time || "30–40 min", color:f.color || "#3d4a5c",
-        method:r.method, platform:r.platform, url:r.url, rate:Number(r.rate), opens:r.opens, closes:r.closes, tracking:!!r.tracking, orderable:r.orderable !== false, image:r.image_url || "", hours:r.hours || null,
+        method:r.method, platform:r.platform, url:r.url, rate:Number(r.rate), opens:r.opens, closes:r.closes, tracking:!!r.tracking, orderable:r.orderable !== false, image:r.image_url || "", banner:r.banner_url || "", hours:r.hours || null,
         menu: ms.filter(m => m.restaurant_id === r.id).map(m => [m.name, m.price == null ? null : Number(m.price), m.image_url || "", m.id, m.category || "", m.description || "", m.available !== false, m.addon === true])};
     });
     try{ localStorage.setItem("catalog", JSON.stringify(RESTAURANTS)); }catch(e){}
@@ -667,7 +673,7 @@ function renderRests(){
   const list = RESTAURANTS.filter(r => (state.cat === "Alles" || r.kind === state.cat) && (!state.q || (r.name + " " + r.kind).toLowerCase().includes(state.q)));
   el.innerHTML = list.length ? list.map((r, ix) => { const view = r.orderable === false, open = isOpen(r) || view; return `
     <button class="rest${open ? "" : " closed"}" style="--i:${ix}" data-id="${esc(r.id)}">
-      <div class="cover" style="background:${tint(r.color)}" aria-hidden="true">${kindEmoji(r.kind)}${imgTag(r.image)}
+      <div class="cover" style="background:${tint(r.color)}" aria-hidden="true">${kindEmoji(r.kind)}${imgTag(r.image || r.banner)}
         ${view ? `<span class="tag">${t("viewOnlyTag")}</span>` : !open ? `<span class="tag closed">${t("closed")}</span>` : r.method === "direct" ? `<span class="tag direct">${I.check}${t("orderDirect")}</span>` : `<span class="tag">${I.ext}${esc(t("via", {p:r.platform}))}</span>`}
       </div>
       <div class="rest-row"><span class="rest-name">${esc(r.name)}</span><span class="time num">${esc(r.time)}</span></div>
@@ -714,7 +720,7 @@ function renderGuest(){
 
 function renderMenu(r){
   $("#g-menu").innerHTML = `
-    <div class="banner" style="background:${tint(r.color, 24, 50)}" aria-hidden="true">${kindEmoji(r.kind)}${imgTag(r.image)}
+    <div class="banner" style="background:${tint(r.color, 24, 50)}" aria-hidden="true">${kindEmoji(r.kind)}${imgTag(r.banner || r.image)}
       <button class="round" id="back" aria-label="${esc(t("backToRests"))}">${I.back}</button></div>
     <h1 class="store">${esc(r.name)}</h1>
     <div class="meta"><span>${esc(tk(r.kind))}</span><span>${esc(r.time)}</span><span>${t("freeDelivery")}</span></div>
@@ -915,9 +921,16 @@ function renderRestMenu(){
   r.menu.forEach(m => { const c = m[4] || "Gerechten"; let g = groups.find(h => h.c === c); if(!g){ g = {c, list:[]}; groups.push(g); } g.list.push(m); });
   const missing = r.menu.filter(m => m[1] == null).length;
   $("#rest-menu").innerHTML = `
-    <div class="panel upl"><div class="upl-row">
-      <div class="upl-img" style="background:${tint(r.color)}">${kindEmoji(r.kind)}${imgTag(r.image)}</div>
-      <div class="grow"><strong>Omslagfoto</strong><div class="muted">Bovenaan je restaurant in de app</div></div>${uploadBtn("rest:" + r.id)}</div></div>
+    <div class="panel upl">
+      <div class="cov">
+        <div class="cov-img" style="aspect-ratio:16/9;background:${tint(r.color)}">${kindEmoji(r.kind)}${imgTag(r.image)}</div>
+        <div class="cov-text"><div><strong>Foto op de startpagina</strong><div class="muted small">Staat op je kaart in de lijst met restaurants. Liggend, bijvoorbeeld 16:9.</div></div>${uploadBtn("rest:" + r.id)}</div>
+      </div>
+      <div class="cov">
+        <div class="cov-img" style="aspect-ratio:3/1;background:${tint(r.color)}">${kindEmoji(r.kind)}${imgTag(r.banner)}</div>
+        <div class="cov-text"><div><strong>Omslagfoto restaurantpagina</strong><div class="muted small">Brede foto bovenaan je eigen pagina, bijvoorbeeld 3:1. Wordt in het midden bijgesneden.</div></div>${uploadBtn("banner:" + r.id)}</div>
+      </div>
+    </div>
     ${missing ? `<div class="info" style="margin:14px 0">${missing === 1 ? "1 gerecht heeft" : missing + " gerechten hebben"} nog geen prijs. Gasten zien een gerecht pas als je een prijs invult.</div>` : ""}
     ${groups.map(g => `<div class="sec-head"><h2>${esc(g.c)}</h2></div><div class="panel upl">${g.list.map(m => `<div class="upl-row">
       <div class="upl-img" style="background:${tint(r.color, 14, 30)}">${itemEmoji(m[0], r.kind, m[4])}${imgTag(m[2])}</div>
@@ -955,16 +968,16 @@ $("#rest-menu").addEventListener("change", async e => {
   const [kind, id] = inp.dataset.up.split(":"), file = inp.files[0];
   inp.closest("label").firstElementChild.textContent = "Bezig…"; inp.disabled = true;
   try{
-    const blob = await resizeImage(file, 1000);
+    const blob = await resizeImage(file, kind === "banner" ? 1600 : 1000);
     const path = rid + "/" + Date.now() + "-" + Math.random().toString(36).slice(2, 8) + ".jpg";
     const up = await fetch(SB_URL + "/storage/v1/object/fotos/" + path, {method:"POST",
       headers:{apikey:SB_KEY, Authorization:"Bearer " + state.auth.token, "Content-Type":"image/jpeg"}, body:blob});
     if(!up.ok) throw new Error(await up.text());
     const url = SB_URL + "/storage/v1/object/public/fotos/" + path;
-    if(kind === "rest"){
-      const rows = await sb("restaurants?id=eq." + encodeURIComponent(id), {method:"PATCH", body:JSON.stringify({image_url:url})});
+    if(kind === "rest" || kind === "banner"){
+      const rows = await sb("restaurants?id=eq." + encodeURIComponent(id), {method:"PATCH", body:JSON.stringify(kind === "rest" ? {image_url:url} : {banner_url:url})});
       if(!rows || !rows.length) throw new Error("Geen rechten om dit op te slaan");
-      find(id).image = url;
+      if(kind === "rest") find(id).image = url; else find(id).banner = url;
     }else{ await patchItem(id, {image_url:url}); const m = findItem(rid, id); if(m) m[2] = url; }
     toast("Foto opgeslagen");
   }catch(err){ console.error(err); toast("Uploaden mislukt"); }
