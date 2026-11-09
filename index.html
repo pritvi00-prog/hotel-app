@@ -44,6 +44,11 @@ svg{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-width:
 .nav{display:flex;gap:6px}
 .link{background:var(--gray);border:0;font-weight:600;padding:9px 16px;border-radius:999px;font-size:.95rem}
 .link:hover{filter:brightness(.95)}
+.lang{display:flex;gap:2px;background:var(--gray);border-radius:999px;padding:3px;margin-right:4px}
+.lang button{border:0;background:transparent;border-radius:999px;padding:6px 10px;font-weight:700;font-size:.8rem;color:var(--muted)}
+.lang button[aria-pressed="true"]{background:var(--btn);color:var(--btn-ink)}
+.brand{white-space:nowrap}
+@media (max-width:520px){.bar-in{padding:0 14px}.brand{font-size:1rem}.mark{display:none}.link{padding:8px 12px;font-size:.88rem}.lang button{padding:6px 8px}}
 .wrap{max-width:1120px;margin:0 auto;padding:20px 20px 140px}
 
 /* Knoppen */
@@ -199,9 +204,10 @@ tr:last-child td{border-bottom:0}
   <div class="bar-in">
     <div class="brand"><span class="mark" aria-hidden="true">M</span><span>Hotel Maashaven</span></div>
     <nav class="nav" aria-label="Navigatie">
+      <div class="lang" id="lang" role="group" aria-label="Language"><button data-l="nl">NL</button><button data-l="en">EN</button><button data-l="de">DE</button></div>
       <button class="link" id="nav-guest">Gastapp</button>
       <button class="link" id="nav-dash">Dashboard</button>
-      <button class="link" id="nav-staff">Personeel</button>
+      <button class="link" id="nav-staff" data-i18n="staff">Personeel</button>
       <button class="link" id="logout">Uitloggen</button>
     </nav>
   </div>
@@ -213,11 +219,11 @@ tr:last-child td{border-bottom:0}
   <section id="v-guest">
     <div id="g-list">
       <div class="pills">
-        <div class="field-pill"><svg viewBox="0 0 24 24"><path d="M12 21s7-6.2 7-11a7 7 0 10-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><label for="room">Bezorgen naar kamer</label><input id="room" inputmode="numeric" maxlength="4" placeholder="304" autocomplete="off"></div>
-        <div class="field-pill"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input id="search" type="search" placeholder="Zoek restaurants" aria-label="Zoek restaurants" autocomplete="off"></div>
+        <div class="field-pill"><svg viewBox="0 0 24 24"><path d="M12 21s7-6.2 7-11a7 7 0 10-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><label for="room" data-i18n="deliverTo">Bezorgen naar kamer</label><input id="room" inputmode="numeric" maxlength="4" placeholder="304" autocomplete="off"></div>
+        <div class="field-pill"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input id="search" type="search" placeholder="Zoek restaurants" aria-label="Zoek restaurants" data-i18n-ph="search" data-i18n-aria="search" autocomplete="off"></div>
       </div>
       <div class="cats" id="cats"></div>
-      <div class="sec-head"><h2>Bezorging op je kamer</h2><span class="muted">Hotel Maashaven</span></div>
+      <div class="sec-head"><h2 data-i18n="feedTitle">Bezorging op je kamer</h2><span class="muted">Hotel Maashaven</span></div>
       <div class="rests" id="rests"></div>
     </div>
     <div id="g-menu" class="hidden"></div>
@@ -269,12 +275,12 @@ tr:last-child td{border-bottom:0}
 </main>
 
 <div class="cartbar hidden" id="cart">
-  <button class="cartbtn" id="open-cart"><span class="count" id="cart-c">0</span><span>Bekijk winkelmand</span><span class="num" id="cart-t"></span></button>
+  <button class="cartbtn" id="open-cart"><span class="count" id="cart-c">0</span><span data-i18n="viewCart">Bekijk winkelmand</span><span class="num" id="cart-t"></span></button>
 </div>
 
 <div class="modal" id="csheet" role="dialog" aria-modal="true" aria-labelledby="c-title">
   <div class="sheet">
-    <div class="sheet-head"><h3 id="c-title">Winkelmand</h3><button class="x" id="c-close" aria-label="Sluiten"></button></div>
+    <div class="sheet-head"><h3 id="c-title" data-i18n="cart">Winkelmand</h3><button class="x" id="c-close" aria-label="Sluiten" data-i18n-aria="close"></button></div>
     <div id="c-body" style="display:grid;gap:14px"></div>
     <button class="btn block" id="place">Bestellen</button>
   </div>
@@ -285,11 +291,11 @@ tr:last-child td{border-bottom:0}
     <h3 id="m-title"></h3>
     <p class="muted" id="m-text"></p>
     <div class="addr" id="m-addr"></div>
-    <p class="muted" style="font-size:.9rem">Kopieer het adres en plak het bij het afrekenen.</p>
+    <p class="muted" style="font-size:.9rem" data-i18n="copyHint">Kopieer het adres en plak het bij het afrekenen.</p>
     <div class="row">
-      <button class="btn" id="m-go">Ga naar bestellen</button>
-      <button class="btn ghost" id="m-copy">Kopieer adres</button>
-      <button class="btn ghost" id="m-close">Annuleren</button>
+      <button class="btn" id="m-go" data-i18n="goOrder">Ga naar bestellen</button>
+      <button class="btn ghost" id="m-copy" data-i18n="copyAddr">Kopieer adres</button>
+      <button class="btn ghost" id="m-close" data-i18n="cancel">Annuleren</button>
     </div>
   </div>
 </div>
@@ -298,7 +304,7 @@ tr:last-child td{border-bottom:0}
 const BASE_TITLE = document.title;
 const HOTEL = "Hotel Maashaven, Maashaven Zuidzijde 1, Rotterdam";
 const $ = s => document.querySelector(s);
-const eur = n => Number(n).toLocaleString("nl-NL",{style:"currency",currency:"EUR"});
+const eur = n => Number(n).toLocaleString(({nl:"nl-NL",en:"en-GB",de:"de-DE"})[state.lang] || "nl-NL", {style:"currency",currency:"EUR"});
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const hhmm = d => d.toLocaleTimeString("nl-NL",{hour:"2-digit",minute:"2-digit"});
 function ago(d){ const m = Math.round((Date.now() - d) / 60000); return m < 1 ? "zojuist" : m < 60 ? m + " min geleden" : Math.floor(m / 60) + " uur geleden"; }
@@ -323,7 +329,38 @@ const FALLBACK = [
   {id:"wok", name:"Wok Palace", kind:"Chinees", time:"30–45 min", color:"#6a2a8a", method:"direct", rate:0.12, menu:[["Babi pangang",11.9],["Nasi goreng",10.5],["Loempia’s (4x)",5.5],["Bami goreng",10.5]]}
 ];
 
-const state = {view:"guest", open:null, cart:{}, orders:[], pending:null, filter:"Actief", done:null, loaded:false, auth:null, cat:"Alles", q:"", cartOpen:false, seen:null};
+const T = {
+nl:{staff:"Personeel",deliverTo:"Bezorgen naar kamer",search:"Zoek restaurants",feedTitle:"Bezorging op je kamer",viewCart:"Bekijk winkelmand",cart:"Winkelmand",close:"Sluiten",copyHint:"Kopieer het adres en plak het bij het afrekenen.",goOrder:"Ga naar bestellen",copyAddr:"Kopieer adres",cancel:"Annuleren",all:"Alles",closed:"Gesloten",orderDirect:"Bestel direct",via:"Via {p}",opensAt:"Opent om {t}",noResults:"Geen restaurants gevonden. Probeer een andere zoekterm of categorie.",needRoom:"Vul eerst je kamernummer in",closedToast:"{n} is nu gesloten en opent om {t}",continueTo:"Verder naar {p}",orderingVia:"Je bestelt bij {r} via {p}. Bezorgadres:",room:"kamer",copied:"Adres gekopieerd",copyFail:"Kopiëren lukt niet, selecteer het adres zelf",backToRests:"Terug naar restaurants",freeDelivery:"Gratis bezorging op je kamer",deliveryTo:"Bezorging naar kamer {r}",change:"Wijzig",inCart:"{q} in mand",less:"Minder {n}",more:"Meer {n}",addItem:"Voeg {n} toe",total:"Totaal",deliveryInfo:"Bezorging naar {h}, kamer {r}. Je betaalt bij ontvangst.",orderFor:"Bestel voor {a}",orderFail:"Bestellen mislukt, probeer opnieuw",dbFail:"Database niet bereikbaar, voorbeelddata getoond",payOnReceipt:"Je betaalt bij ontvangst.",stNieuw:"Bestelling ontvangen",stGeaccepteerd:"Het restaurant maakt je bestelling klaar",stOnderweg:"Je bestelling is onderweg",stBezorgd:"Bezorgd, eet smakelijk!",trk0:"Ontvangen",trk1:"Wordt bereid",trk2:"Onderweg",trk3:"Bezorgd",progress:"Voortgang",orderMore:"Nog iets bestellen"},
+en:{staff:"Staff",deliverTo:"Deliver to room",search:"Search restaurants",feedTitle:"Delivered to your room",viewCart:"View basket",cart:"Basket",close:"Close",copyHint:"Copy the address and paste it at checkout.",goOrder:"Continue to order",copyAddr:"Copy address",cancel:"Cancel",all:"All",closed:"Closed",orderDirect:"Order direct",via:"Via {p}",opensAt:"Opens at {t}",noResults:"No restaurants found. Try another search or category.",needRoom:"Enter your room number first",closedToast:"{n} is closed right now and opens at {t}",continueTo:"Continue to {p}",orderingVia:"You’re ordering from {r} via {p}. Delivery address:",room:"room",copied:"Address copied",copyFail:"Copy failed, select the address manually",backToRests:"Back to restaurants",freeDelivery:"Free delivery to your room",deliveryTo:"Delivery to room {r}",change:"Change",inCart:"{q} in basket",less:"Remove one {n}",more:"Add one more {n}",addItem:"Add {n}",total:"Total",deliveryInfo:"Delivery to {h}, room {r}. You pay on receipt.",orderFor:"Order for {a}",orderFail:"Order failed, please try again",dbFail:"Database unreachable, showing sample data",payOnReceipt:"You pay on receipt.",stNieuw:"Order received",stGeaccepteerd:"The restaurant is preparing your order",stOnderweg:"Your order is on its way",stBezorgd:"Delivered, enjoy your meal!",trk0:"Received",trk1:"Preparing",trk2:"On its way",trk3:"Delivered",progress:"Progress",orderMore:"Order something else"},
+de:{staff:"Personal",deliverTo:"Lieferung an Zimmer",search:"Restaurants suchen",feedTitle:"Lieferung auf dein Zimmer",viewCart:"Warenkorb ansehen",cart:"Warenkorb",close:"Schließen",copyHint:"Kopiere die Adresse und füge sie beim Bezahlen ein.",goOrder:"Weiter zur Bestellung",copyAddr:"Adresse kopieren",cancel:"Abbrechen",all:"Alle",closed:"Geschlossen",orderDirect:"Direkt bestellen",via:"Über {p}",opensAt:"Öffnet um {t}",noResults:"Keine Restaurants gefunden. Versuche eine andere Suche oder Kategorie.",needRoom:"Gib zuerst deine Zimmernummer ein",closedToast:"{n} ist gerade geschlossen und öffnet um {t}",continueTo:"Weiter zu {p}",orderingVia:"Du bestellst bei {r} über {p}. Lieferadresse:",room:"Zimmer",copied:"Adresse kopiert",copyFail:"Kopieren fehlgeschlagen, markiere die Adresse selbst",backToRests:"Zurück zu den Restaurants",freeDelivery:"Kostenlose Lieferung auf dein Zimmer",deliveryTo:"Lieferung an Zimmer {r}",change:"Ändern",inCart:"{q} im Warenkorb",less:"Weniger {n}",more:"Mehr {n}",addItem:"{n} hinzufügen",total:"Gesamt",deliveryInfo:"Lieferung an {h}, Zimmer {r}. Du zahlst bei Erhalt.",orderFor:"Bestellen für {a}",orderFail:"Bestellung fehlgeschlagen, bitte erneut versuchen",dbFail:"Datenbank nicht erreichbar, Beispieldaten werden gezeigt",payOnReceipt:"Du zahlst bei Erhalt.",stNieuw:"Bestellung erhalten",stGeaccepteerd:"Das Restaurant bereitet deine Bestellung zu",stOnderweg:"Deine Bestellung ist unterwegs",stBezorgd:"Geliefert, guten Appetit!",trk0:"Erhalten",trk1:"Wird zubereitet",trk2:"Unterwegs",trk3:"Geliefert",progress:"Fortschritt",orderMore:"Noch etwas bestellen"}
+};
+const KIND_TR = {Kip:{en:"Chicken", de:"Hähnchen"}, Chinees:{en:"Chinese", de:"Chinesisch"}};
+const LANGS = ["nl","en","de"];
+function detectLang(){
+  try{ const sv = localStorage.getItem("lang"); if(LANGS.includes(sv)) return sv; }catch(e){}
+  const b = ((navigator.language || "nl").slice(0, 2)).toLowerCase();
+  return LANGS.includes(b) ? b : "en";
+}
+const t = (k, v = {}) => ((T[state.lang] && T[state.lang][k]) || T.nl[k] || k).replace(/\{(\w+)\}/g, (m, n) => v[n] ?? m);
+const tk = k => (KIND_TR[k] && KIND_TR[k][state.lang]) || k;
+function applyStatic(){
+  document.querySelectorAll("[data-i18n]").forEach(e => { e.textContent = t(e.dataset.i18n); });
+  document.querySelectorAll("[data-i18n-ph]").forEach(e => { e.placeholder = t(e.dataset.i18nPh); });
+  document.querySelectorAll("[data-i18n-aria]").forEach(e => e.setAttribute("aria-label", t(e.dataset.i18nAria)));
+  document.querySelectorAll("#lang button").forEach(b => b.setAttribute("aria-pressed", b.dataset.l === state.lang));
+  document.documentElement.lang = state.lang;
+}
+function setLang(l){
+  state.lang = l;
+  try{ localStorage.setItem("lang", l); }catch(e){}
+  applyStatic(); renderRests();
+  if(state.open) renderMenu(find(state.open));
+  if(state.done) renderDone();
+  updateCart();
+  if($("#csheet").classList.contains("open")) openCart();
+}
+
+const state = {view:"guest", open:null, cart:{}, orders:[], pending:null, filter:"Actief", done:null, loaded:false, auth:null, cat:"Alles", q:"", cartOpen:false, seen:null, lang:detectLang()};
 let RESTAURANTS = FALLBACK;
 const find = id => RESTAURANTS.find(r => r.id === id);
 const room = () => ($("#room").value || "").trim();
@@ -344,7 +381,6 @@ function beep(){
 document.addEventListener("click", initAudio, {once:true});
 const uuid = () => (window.crypto && crypto.randomUUID) ? crypto.randomUUID()
   : "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, c => { const r = Math.random() * 16 | 0; return (c === "x" ? r : (r & 3 | 8)).toString(16); });
-const STATUS_TXT = {Nieuw:"Bestelling ontvangen", Geaccepteerd:"Het restaurant maakt je bestelling klaar", Onderweg:"Je bestelling is onderweg", Bezorgd:"Bezorgd, eet smakelijk!"};
 const STORE = "hotelOrder";
 const saveOrder = o => { try{ localStorage.setItem(STORE, JSON.stringify(o)); }catch(e){} };
 const clearOrder = () => { try{ localStorage.removeItem(STORE); }catch(e){} };
@@ -374,7 +410,7 @@ async function loadData(){
         method:r.method, platform:r.platform, url:r.url, rate:Number(r.rate), opens:r.opens, closes:r.closes,
         menu: ms.filter(m => m.restaurant_id === r.id).map(m => [m.name, Number(m.price)])};
     });
-  }catch(e){ console.error(e); toast("Database niet bereikbaar, voorbeelddata getoond"); }
+  }catch(e){ console.error(e); toast(t("dbFail")); }
   state.loaded = true;
   renderRests();
 }
@@ -420,6 +456,7 @@ function go(v){
   state.view = v;
   ["guest","login","rest","hotel","recep"].forEach(x => $("#v-" + x).classList.toggle("hidden", x !== v));
   $("#nav-guest").classList.toggle("hidden", v === "guest");
+  $("#lang").classList.toggle("hidden", v !== "guest");
   $("#nav-dash").classList.toggle("hidden", !(state.auth && v === "guest"));
   $("#nav-staff").classList.toggle("hidden", !(!state.auth && v === "guest"));
   $("#logout").classList.toggle("hidden", !state.auth);
@@ -454,7 +491,7 @@ const tint = (c, a = 18, b = 40) => `linear-gradient(135deg,color-mix(in srgb,${
 function renderCats(){
   const kinds = ["Alles", ...new Set(RESTAURANTS.map(r => r.kind))];
   $("#cats").innerHTML = kinds.map(k =>
-    `<button class="cat" data-c="${esc(k)}" aria-pressed="${state.cat === k}"><span class="cat-ic">${k === "Alles" ? "🍽️" : kindEmoji(k)}</span><span>${esc(k)}</span></button>`).join("");
+    `<button class="cat" data-c="${esc(k)}" aria-pressed="${state.cat === k}"><span class="cat-ic">${k === "Alles" ? "🍽️" : kindEmoji(k)}</span><span>${k === "Alles" ? t("all") : esc(tk(k))}</span></button>`).join("");
 }
 $("#cats").addEventListener("click", e => { const b = e.target.closest("[data-c]"); if(b){ state.cat = b.dataset.c; renderCats(); renderRests(); } });
 $("#search").addEventListener("input", e => { state.q = e.target.value.trim().toLowerCase(); renderRests(); });
@@ -467,23 +504,23 @@ function renderRests(){
   el.innerHTML = list.length ? list.map(r => { const open = isOpen(r); return `
     <button class="rest${open ? "" : " closed"}" data-id="${esc(r.id)}">
       <div class="cover" style="background:${tint(r.color)}" aria-hidden="true">${kindEmoji(r.kind)}
-        ${!open ? `<span class="tag closed">Gesloten</span>` : r.method === "direct" ? `<span class="tag direct">${I.check}Bestel direct</span>` : `<span class="tag">${I.ext}Via ${esc(r.platform)}</span>`}
+        ${!open ? `<span class="tag closed">${t("closed")}</span>` : r.method === "direct" ? `<span class="tag direct">${I.check}${t("orderDirect")}</span>` : `<span class="tag">${I.ext}${esc(t("via", {p:r.platform}))}</span>`}
       </div>
       <div class="rest-row"><span class="rest-name">${esc(r.name)}</span><span class="time num">${esc(r.time)}</span></div>
-      <div class="rest-sub">${open ? esc(r.kind) : "Opent om " + hm(r.opens)}</div>
-    </button>`; }).join("") : `<div class="empty">Geen restaurants gevonden. Probeer een andere zoekterm of categorie.</div>`;
+      <div class="rest-sub">${open ? esc(tk(r.kind)) : t("opensAt", {t:hm(r.opens)})}</div>
+    </button>`; }).join("") : `<div class="empty">${t("noResults")}</div>`;
 }
 $("#rests").addEventListener("click", e => { const b = e.target.closest("button.rest"); if(b) pick(b.dataset.id); });
 
 function pick(id){
   const r = find(id);
-  if(!isOpen(r)){ toast(r.name + " is nu gesloten en opent om " + hm(r.opens)); return; }
-  if(!room()){ toast("Vul eerst je kamernummer in"); $("#room").focus(); return; }
+  if(!isOpen(r)){ toast(t("closedToast", {n:r.name, t:hm(r.opens)})); return; }
+  if(!room()){ toast(t("needRoom")); $("#room").focus(); return; }
   if(r.method === "refer"){
     state.pending = r;
-    $("#m-title").textContent = "Verder naar " + r.platform;
-    $("#m-text").textContent = "Je bestelt bij " + r.name + " via " + r.platform + ". Bezorgadres:";
-    $("#m-addr").textContent = HOTEL + ", kamer " + room();
+    $("#m-title").textContent = t("continueTo", {p:r.platform});
+    $("#m-text").textContent = t("orderingVia", {r:r.name, p:r.platform});
+    $("#m-addr").textContent = HOTEL + ", " + t("room") + " " + room();
     $("#modal").classList.add("open");
     return;
   }
@@ -492,8 +529,8 @@ function pick(id){
 }
 $("#m-close").addEventListener("click", () => $("#modal").classList.remove("open"));
 $("#m-copy").addEventListener("click", async () => {
-  try{ await navigator.clipboard.writeText($("#m-addr").textContent); toast("Adres gekopieerd"); }
-  catch(e){ toast("Kopiëren lukt niet, selecteer het adres zelf"); }
+  try{ await navigator.clipboard.writeText($("#m-addr").textContent); toast(t("copied")); }
+  catch(e){ toast(t("copyFail")); }
 });
 $("#m-go").addEventListener("click", () => {
   window.open(state.pending.url, "_blank", "noopener");
@@ -513,10 +550,10 @@ function renderGuest(){
 function renderMenu(r){
   $("#g-menu").innerHTML = `
     <div class="banner" style="background:${tint(r.color, 24, 50)}" aria-hidden="true">${kindEmoji(r.kind)}
-      <button class="round" id="back" aria-label="Terug naar restaurants">${I.back}</button></div>
+      <button class="round" id="back" aria-label="${esc(t("backToRests"))}">${I.back}</button></div>
     <h1 class="store">${esc(r.name)}</h1>
-    <div class="meta"><span>${esc(r.kind)}</span><span>${esc(r.time)}</span><span>Gratis bezorging op je kamer</span></div>
-    <div class="deliv"><span>Bezorging naar kamer <b>${esc(room())}</b></span><button class="textbtn" id="chg">Wijzig</button></div>
+    <div class="meta"><span>${esc(tk(r.kind))}</span><span>${esc(r.time)}</span><span>${t("freeDelivery")}</span></div>
+    <div class="deliv"><span>${t("deliveryTo", {r:"<b>" + esc(room()) + "</b>"})}</span><button class="textbtn" id="chg">${t("change")}</button></div>
     <ul class="items" id="items"></ul>`;
   renderItems(r);
 }
@@ -524,11 +561,11 @@ function renderItems(r){
   $("#items").innerHTML = r.menu.map((m, i) => {
     const q = state.cart[i] || 0, n = esc(m[0]);
     return `<li class="item">
-      <div><span class="item-name">${n}</span><span class="item-price">${eur(m[1])}</span>${q ? `<span class="item-count">${q} in mand</span>` : ""}</div>
+      <div><span class="item-name">${n}</span><span class="item-price">${eur(m[1])}</span>${q ? `<span class="item-count">${t("inCart", {q})}</span>` : ""}</div>
       <div class="thumb" style="background:${tint(r.color, 14, 30)}" aria-hidden="true">${itemEmoji(m[0], r.kind)}
         <div class="ctl">${q
-          ? `<button data-i="${i}" data-d="-1" aria-label="Minder ${n}">${I.minus}</button><output>${q}</output><button data-i="${i}" data-d="1" aria-label="Meer ${n}">${I.plus}</button>`
-          : `<button data-i="${i}" data-d="1" aria-label="Voeg ${n} toe">${I.plus}</button>`}</div>
+          ? `<button data-i="${i}" data-d="-1" aria-label="${t("less", {n})}">${I.minus}</button><output>${q}</output><button data-i="${i}" data-d="1" aria-label="${t("more", {n})}">${I.plus}</button>`
+          : `<button data-i="${i}" data-d="1" aria-label="${t("addItem", {n})}">${I.plus}</button>`}</div>
       </div></li>`;
   }).join("");
 }
@@ -559,9 +596,9 @@ function openCart(){
   $("#c-body").innerHTML = `
     <p class="muted">${esc(r.name)}</p>
     <ul class="lines">${c.items.map(i => `<li><span>${i.q}×</span><span>${esc(i.name)}</span><span class="num">${eur(i.q * i.p)}</span></li>`).join("")}</ul>
-    <div class="total"><span>Totaal</span><span class="num">${eur(c.t)}</span></div>
-    <div class="info">Bezorging naar ${esc(HOTEL)}, kamer ${esc(room())}. Je betaalt bij ontvangst.</div>`;
-  $("#place").textContent = "Bestel voor " + eur(c.t);
+    <div class="total"><span>${t("total")}</span><span class="num">${eur(c.t)}</span></div>
+    <div class="info">${t("deliveryInfo", {h:esc(HOTEL), r:esc(room())})}</div>`;
+  $("#place").textContent = t("orderFor", {a:eur(c.t)});
   $("#csheet").classList.add("open");
 }
 $("#open-cart").addEventListener("click", openCart);
@@ -570,13 +607,13 @@ $("#csheet").addEventListener("click", e => { if(e.target.id === "csheet") $("#c
 
 $("#place").addEventListener("click", async () => {
   const r = find(state.open), c = cartTotals();
-  if(!room()){ toast("Vul eerst je kamernummer in"); return; }
+  if(!room()){ toast(t("needRoom")); return; }
   const btn = $("#place"); btn.disabled = true;
   const token = uuid();
   try{
     await sb("orders", {method:"POST", headers:{Prefer:"return=minimal"},
       body:JSON.stringify({token, restaurant_id:r.id, room:room(), items:c.items, total:c.t, commission:Math.round(c.t * r.rate * 100) / 100})});
-  }catch(e){ console.error(e); toast("Bestellen mislukt, probeer opnieuw"); btn.disabled = false; return; }
+  }catch(e){ console.error(e); toast(t("orderFail")); btn.disabled = false; return; }
   btn.disabled = false;
   $("#csheet").classList.remove("open");
   state.done = {token, rest:r.name, items:c.items, total:c.t, room:room(), status:"Nieuw", at:Date.now()};
@@ -586,15 +623,15 @@ $("#place").addEventListener("click", async () => {
 });
 function renderDone(){
   const d = state.done, step = FLOW.indexOf(d.status), fin = d.status === "Bezorgd";
-  const labels = ["Ontvangen", "Wordt bereid", "Onderweg", "Bezorgd"];
+  const labels = [t("trk0"), t("trk1"), t("trk2"), t("trk3")];
   $("#g-done").innerHTML = `<div class="done">
     <div class="done-icon">${fin ? I.check : I.clock}</div>
-    <h2>${esc(STATUS_TXT[d.status] || d.status)}</h2>
-    <p class="muted">${esc(d.rest)}, kamer ${esc(d.room)}. Je betaalt bij ontvangst.</p>
-    <ol class="track" aria-label="Voortgang">${labels.map((l, k) => `<li class="${k < step ? "past" : k === step ? "now" : ""}"><i></i><span>${l}</span></li>`).join("")}</ol>
+    <h2>${esc(T[state.lang]["st" + d.status] || d.status)}</h2>
+    <p class="muted">${esc(d.rest)}, ${t("room")} ${esc(d.room)}. ${t("payOnReceipt")}</p>
+    <ol class="track" aria-label="${t("progress")}">${labels.map((l, k) => `<li class="${k < step ? "past" : k === step ? "now" : ""}"><i></i><span>${l}</span></li>`).join("")}</ol>
     <ul class="summary">${d.items.map(i => `<li><span>${i.q}× ${esc(i.name)}</span><span class="num">${eur(i.q * i.p)}</span></li>`).join("")}
-      <li class="tot"><span>Totaal</span><span class="num">${eur(d.total)}</span></li></ul>
-    <button class="btn block" id="again">${fin ? "Terug naar restaurants" : "Nog iets bestellen"}</button></div>`;
+      <li class="tot"><span>${t("total")}</span><span class="num">${eur(d.total)}</span></li></ul>
+    <button class="btn block" id="again">${fin ? t("backToRests") : t("orderMore")}</button></div>`;
 }
 async function pollStatus(){
   const d = state.done;
@@ -675,6 +712,7 @@ $("#nav-guest").addEventListener("click", () => go("guest"));
 $("#nav-staff").addEventListener("click", () => go("login"));
 $("#nav-dash").addEventListener("click", () => go(ROLE_VIEW[state.auth.role]));
 $("#logout").addEventListener("click", () => { logout(); toast("Uitgelogd"); });
+$("#lang").addEventListener("click", e => { const b = e.target.closest("[data-l]"); if(b) setLang(b.dataset.l); });
 $("#l-go").addEventListener("click", login);
 $("#l-pw").addEventListener("keydown", e => { if(e.key === "Enter") login(); });
 setInterval(() => { if(state.auth && (state.view === "rest" || state.view === "hotel" || state.view === "recep") && !document.hidden) refresh(); }, 8000);
@@ -690,6 +728,7 @@ try{
   if(saved && saved.token && Date.now() - saved.at < 6 * 3600 * 1000){ state.done = saved; }
   else if(saved) clearOrder();
 }catch(e){}
+applyStatic();
 go("guest");
 if(state.done){ renderGuest(); pollStatus(); }
 renderRests();
