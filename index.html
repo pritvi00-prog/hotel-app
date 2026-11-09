@@ -84,7 +84,9 @@ svg{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-width:
 .rest{display:block;text-align:left;background:none;border:0;padding:0}
 .cover{position:relative;height:170px;border-radius:12px;display:grid;place-items:center;font-size:4.2rem;overflow:hidden}
 .rest:hover .cover{filter:brightness(.96)}
-.tag{position:absolute;left:10px;top:10px;background:var(--bg);color:var(--ink);border-radius:999px;padding:4px 10px;font-size:.78rem;font-weight:700;display:inline-flex;gap:5px;align-items:center}
+.cover img,.banner img,.thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.thumb img{border-radius:inherit}
+.tag{z-index:1;position:absolute;left:10px;top:10px;background:var(--bg);color:var(--ink);border-radius:999px;padding:4px 10px;font-size:.78rem;font-weight:700;display:inline-flex;gap:5px;align-items:center}
 .tag svg{width:13px;height:13px}
 .tag.direct{background:var(--good);color:#fff}
 .rest-row{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:10px}
@@ -100,7 +102,7 @@ svg{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-width:
 
 /* Winkelpagina */
 .banner{position:relative;height:200px;border-radius:12px;display:grid;place-items:center;font-size:5.5rem;overflow:hidden}
-.round{position:absolute;left:14px;top:14px;width:42px;height:42px;border-radius:50%;border:0;background:var(--bg);color:var(--ink);display:grid;place-items:center;box-shadow:var(--shadow)}
+.round{z-index:1;position:absolute;left:14px;top:14px;width:42px;height:42px;border-radius:50%;border:0;background:var(--bg);color:var(--ink);display:grid;place-items:center;box-shadow:var(--shadow)}
 .store{font-size:2.1rem;font-weight:800;margin:18px 0 6px}
 .meta{display:flex;gap:16px;flex-wrap:wrap;color:var(--muted);font-size:.95rem}
 .deliv{display:inline-flex;align-items:center;gap:12px;margin:16px 0 4px;background:var(--gray);border-radius:999px;padding:9px 16px;font-size:.95rem}
@@ -111,7 +113,7 @@ svg{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-width:
 .item-price{display:block;color:var(--muted);margin-top:4px;font-variant-numeric:tabular-nums}
 .item-count{display:inline-block;margin-top:8px;background:var(--gray);border-radius:999px;font-size:.8rem;font-weight:700;padding:2px 10px}
 .thumb{position:relative;width:104px;height:104px;border-radius:10px;display:grid;place-items:center;font-size:2.6rem;flex:none;align-self:center}
-.ctl{position:absolute;right:6px;bottom:6px;font-size:1rem;line-height:1;display:flex;align-items:center;background:var(--bg);color:var(--ink);border-radius:999px;box-shadow:var(--shadow)}
+.ctl{z-index:1;position:absolute;right:6px;bottom:6px;font-size:1rem;line-height:1;display:flex;align-items:center;background:var(--bg);color:var(--ink);border-radius:999px;box-shadow:var(--shadow)}
 .ctl button{width:34px;height:34px;border-radius:50%;border:0;background:transparent;color:inherit;display:grid;place-items:center}
 .ctl output{min-width:22px;text-align:center;font-weight:700;font-variant-numeric:tabular-nums}
 
@@ -137,6 +139,13 @@ svg{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-width:
 .track .past i,.track .now i{background:var(--good)}
 .track .now{color:var(--ink)}
 @media (prefers-reduced-motion:no-preference){.track .now i{animation:pulse 1.4s ease-in-out infinite}@keyframes pulse{50%{opacity:.35}}}
+.upl{display:grid;gap:0;padding:6px 18px;margin-bottom:6px}
+.upl-row{display:flex;align-items:center;gap:14px;padding:12px 0}
+.upl-row+.upl-row{border-top:1px solid var(--line)}
+.grow{flex:1;min-width:0}
+.upl-img{position:relative;width:64px;height:64px;border-radius:12px;overflow:hidden;display:grid;place-items:center;font-size:1.8rem;flex:none}
+.upl-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.upl-btn{cursor:pointer;padding:10px 16px}
 .map{position:relative;z-index:0;isolation:isolate;width:100%;height:280px;border-radius:12px;overflow:hidden;border:1px solid var(--line)}
 .pin{width:38px;height:38px;border-radius:50%;background:var(--bg);display:grid;place-items:center;font-size:1.25rem;box-shadow:var(--shadow)}
 .btnrow{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
@@ -249,8 +258,12 @@ tr:last-child td{border-bottom:0}
   <!-- RESTAURANT -->
   <section id="v-rest" class="hidden">
     <div class="sec-head" style="margin-top:8px"><h2 id="rest-title">Bestellingen</h2><span class="muted" id="rest-sync"></span></div>
-    <div class="chips" id="chips"></div>
-    <div class="orders" id="orders"></div>
+    <div class="chips" id="rest-tabs"></div>
+    <div id="rest-orders-wrap">
+      <div class="chips" id="chips"></div>
+      <div class="orders" id="orders"></div>
+    </div>
+    <div id="rest-menu" class="hidden"></div>
   </section>
 
   <!-- RECEPTIE -->
@@ -366,7 +379,7 @@ function setLang(l){
   if($("#csheet").classList.contains("open")) openCart();
 }
 
-const state = {view:"guest", open:null, cart:{}, orders:[], pending:null, filter:"Actief", done:null, loaded:false, auth:null, cat:"Alles", q:"", cartOpen:false, seen:null, lang:detectLang()};
+const state = {view:"guest", open:null, cart:{}, orders:[], pending:null, filter:"Actief", done:null, loaded:false, auth:null, cat:"Alles", q:"", cartOpen:false, seen:null, lang:detectLang(), restTab:"orders", menuDrawn:false};
 let RESTAURANTS = FALLBACK;
 const find = id => RESTAURANTS.find(r => r.id === id);
 const room = () => ($("#room").value || "").trim();
@@ -445,8 +458,8 @@ async function loadData(){
     RESTAURANTS = rs.map(r => {
       const f = FALLBACK.find(x => x.id === r.id) || {};
       return {id:r.id, name:r.name, kind:r.kind, time:f.time || "30–40 min", color:f.color || "#3d4a5c",
-        method:r.method, platform:r.platform, url:r.url, rate:Number(r.rate), opens:r.opens, closes:r.closes, tracking:!!r.tracking,
-        menu: ms.filter(m => m.restaurant_id === r.id).map(m => [m.name, Number(m.price)])};
+        method:r.method, platform:r.platform, url:r.url, rate:Number(r.rate), opens:r.opens, closes:r.closes, tracking:!!r.tracking, image:r.image_url || "",
+        menu: ms.filter(m => m.restaurant_id === r.id).map(m => [m.name, Number(m.price), m.image_url || "", m.id])};
     });
   }catch(e){ console.error(e); toast(t("dbFail")); }
   state.loaded = true;
@@ -484,7 +497,7 @@ async function login(){
     go(ROLE_VIEW[state.auth.role] || "login");
   }catch(e){ state.auth = null; $("#l-err").textContent = "Inloggen mislukt. Controleer e-mail en wachtwoord."; }
 }
-function logout(){ stopShare(); state.auth = null; state.orders = []; state.seen = null; document.title = BASE_TITLE; go("guest"); }
+function logout(){ stopShare(); state.restTab = "orders"; state.menuDrawn = false; state.auth = null; state.orders = []; state.seen = null; document.title = BASE_TITLE; go("guest"); }
 
 /* ---------- Navigatie ---------- */
 const ROLE_VIEW = {restaurant:"rest", hotel:"hotel", reception:"recep"};
@@ -524,6 +537,7 @@ const KIND_EMOJI = {Burgers:"🍔", Kip:"🍗", Pizza:"🍕", Snacks:"🍟", Chi
 const ITEM_EMOJI = [[/tiramisu/i,"🍰"],[/pizza|margherita|pepperoni|quattro/i,"🍕"],[/friet/i,"🍟"],[/frikandel/i,"🌭"],[/kapsalon/i,"🥙"],[/kroket/i,"🧆"],[/babi|pangang/i,"🍖"],[/nasi/i,"🍛"],[/loempia/i,"🥟"],[/bami/i,"🍜"],[/burger/i,"🍔"],[/kip|chicken/i,"🍗"]];
 const kindEmoji = k => KIND_EMOJI[k] || "🍽️";
 const itemEmoji = (n, k) => { const m = ITEM_EMOJI.find(x => x[0].test(n)); return m ? m[1] : kindEmoji(k); };
+const imgTag = u => /^https:\/\//.test(u || "") ? `<img src="${esc(u)}" alt="" loading="lazy" onerror="this.remove()">` : "";
 const tint = (c, a = 18, b = 40) => `linear-gradient(135deg,color-mix(in srgb,${c} ${a}%,#fff),color-mix(in srgb,${c} ${b}%,#fff))`;
 
 function renderCats(){
@@ -541,7 +555,7 @@ function renderRests(){
   const list = RESTAURANTS.filter(r => (state.cat === "Alles" || r.kind === state.cat) && (!state.q || (r.name + " " + r.kind).toLowerCase().includes(state.q)));
   el.innerHTML = list.length ? list.map(r => { const open = isOpen(r); return `
     <button class="rest${open ? "" : " closed"}" data-id="${esc(r.id)}">
-      <div class="cover" style="background:${tint(r.color)}" aria-hidden="true">${kindEmoji(r.kind)}
+      <div class="cover" style="background:${tint(r.color)}" aria-hidden="true">${kindEmoji(r.kind)}${imgTag(r.image)}
         ${!open ? `<span class="tag closed">${t("closed")}</span>` : r.method === "direct" ? `<span class="tag direct">${I.check}${t("orderDirect")}</span>` : `<span class="tag">${I.ext}${esc(t("via", {p:r.platform}))}</span>`}
       </div>
       <div class="rest-row"><span class="rest-name">${esc(r.name)}</span><span class="time num">${esc(r.time)}</span></div>
@@ -587,7 +601,7 @@ function renderGuest(){
 
 function renderMenu(r){
   $("#g-menu").innerHTML = `
-    <div class="banner" style="background:${tint(r.color, 24, 50)}" aria-hidden="true">${kindEmoji(r.kind)}
+    <div class="banner" style="background:${tint(r.color, 24, 50)}" aria-hidden="true">${kindEmoji(r.kind)}${imgTag(r.image)}
       <button class="round" id="back" aria-label="${esc(t("backToRests"))}">${I.back}</button></div>
     <h1 class="store">${esc(r.name)}</h1>
     <div class="meta"><span>${esc(tk(r.kind))}</span><span>${esc(r.time)}</span><span>${t("freeDelivery")}</span></div>
@@ -600,7 +614,7 @@ function renderItems(r){
     const q = state.cart[i] || 0, n = esc(m[0]);
     return `<li class="item">
       <div><span class="item-name">${n}</span><span class="item-price">${eur(m[1])}</span>${q ? `<span class="item-count">${t("inCart", {q})}</span>` : ""}</div>
-      <div class="thumb" style="background:${tint(r.color, 14, 30)}" aria-hidden="true">${itemEmoji(m[0], r.kind)}
+      <div class="thumb" style="background:${tint(r.color, 14, 30)}" aria-hidden="true">${itemEmoji(m[0], r.kind)}${imgTag(m[2])}
         <div class="ctl">${q
           ? `<button data-i="${i}" data-d="-1" aria-label="${t("less", {n})}">${I.minus}</button><output>${q}</output><button data-i="${i}" data-d="1" aria-label="${t("more", {n})}">${I.plus}</button>`
           : `<button data-i="${i}" data-d="1" aria-label="${t("addItem", {n})}">${I.plus}</button>`}</div>
@@ -712,6 +726,11 @@ function renderRestView(){
   const rid = state.auth && state.auth.restaurant_id, r = find(rid);
   $("#rest-title").textContent = r ? r.name : "Bestellingen";
   $("#rest-sync").textContent = "Ververst automatisch";
+  $("#rest-tabs").innerHTML = [["orders","Bestellingen"],["menu","Menu en foto’s"]].map(([k, l]) =>
+    `<button class="chip" data-tab="${k}" aria-pressed="${state.restTab === k}">${l}</button>`).join("");
+  $("#rest-orders-wrap").classList.toggle("hidden", state.restTab !== "orders");
+  $("#rest-menu").classList.toggle("hidden", state.restTab !== "menu");
+  if(state.restTab === "menu"){ if(!state.menuDrawn) renderRestMenu(); return; }
   const all = state.orders.filter(o => o.restId === rid);
   const groups = {Actief:all.filter(o => o.status !== "Bezorgd"), Bezorgd:all.filter(o => o.status === "Bezorgd"), Alle:all};
   $("#chips").innerHTML = ["Actief","Bezorgd","Alle"].map(k =>
@@ -742,6 +761,55 @@ $("#orders").addEventListener("click", async e => {
   try{ await sb("orders?id=eq." + o.id, {method:"PATCH", body:JSON.stringify(next === "Bezorgd" ? {status:next, courier_lat:null, courier_lng:null, courier_at:null} : {status:next})}); o.status = next; if(next === "Bezorgd" && shareOrder === o.id) stopShare(); }
   catch(err){ console.error(err); toast("Status bijwerken mislukt"); }
   renderRestView();
+});
+
+/* ---------- Menu en foto's (restaurant) ---------- */
+function resizeImage(file, max){
+  return new Promise((res, rej) => {
+    const img = new Image(), u = URL.createObjectURL(file);
+    img.onload = () => {
+      const k = Math.min(1, max / Math.max(img.width, img.height)), c = document.createElement("canvas");
+      c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+      c.getContext("2d").drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(u);
+      c.toBlob(b => b ? res(b) : rej(new Error("resize")), "image/jpeg", 0.82);
+    };
+    img.onerror = () => rej(new Error("Geen geldige afbeelding"));
+    img.src = u;
+  });
+}
+const uploadBtn = key => `<label class="btn ghost upl-btn"><span>Foto kiezen</span><input type="file" accept="image/*" data-up="${esc(key)}" hidden></label>`;
+function renderRestMenu(){
+  const r = find(state.auth.restaurant_id); if(!r) return;
+  state.menuDrawn = true;
+  $("#rest-menu").innerHTML = `
+    <div class="panel upl"><div class="upl-row">
+      <div class="upl-img" style="background:${tint(r.color)}">${kindEmoji(r.kind)}${imgTag(r.image)}</div>
+      <div class="grow"><strong>Omslagfoto</strong><div class="muted">Bovenaan je restaurant in de app</div></div>${uploadBtn("rest:" + r.id)}</div></div>
+    <div class="sec-head"><h2>Gerechten</h2></div>
+    <div class="panel upl">${r.menu.map(m => `<div class="upl-row">
+      <div class="upl-img" style="background:${tint(r.color, 14, 30)}">${itemEmoji(m[0], r.kind)}${imgTag(m[2])}</div>
+      <div class="grow"><strong>${esc(m[0])}</strong><div class="muted num">${eur(m[1])}</div></div>${m[3] != null ? uploadBtn("item:" + m[3]) : ""}</div>`).join("")}</div>
+    <p class="muted" style="margin-top:12px">Gebruik alleen foto’s waarvan je het recht hebt om ze te gebruiken. Foto’s worden automatisch verkleind.</p>`;
+}
+$("#rest-tabs").addEventListener("click", e => { const b = e.target.closest("[data-tab]"); if(b){ state.restTab = b.dataset.tab; state.menuDrawn = false; renderRestView(); } });
+$("#rest-menu").addEventListener("change", async e => {
+  const inp = e.target.closest("input[data-up]"); if(!inp || !inp.files[0]) return;
+  const [kind, id] = inp.dataset.up.split(":"), file = inp.files[0], rid = state.auth.restaurant_id;
+  inp.closest("label").firstElementChild.textContent = "Bezig…"; inp.disabled = true;
+  try{
+    const blob = await resizeImage(file, 1000);
+    const path = rid + "/" + Date.now() + "-" + Math.random().toString(36).slice(2, 8) + ".jpg";
+    const up = await fetch(SB_URL + "/storage/v1/object/fotos/" + path, {method:"POST",
+      headers:{apikey:SB_KEY, Authorization:"Bearer " + state.auth.token, "Content-Type":"image/jpeg"}, body:blob});
+    if(!up.ok) throw new Error(await up.text());
+    const url = SB_URL + "/storage/v1/object/public/fotos/" + path;
+    const rows = await sb((kind === "rest" ? "restaurants" : "menu_items") + "?id=eq." + encodeURIComponent(id), {method:"PATCH", body:JSON.stringify({image_url:url})});
+    if(!rows || !rows.length) throw new Error("Geen rechten om dit op te slaan");
+    if(kind === "rest") find(id).image = url;
+    else { const m = find(rid).menu.find(x => String(x[3]) === id); if(m) m[2] = url; }
+    toast("Foto opgeslagen");
+  }catch(err){ console.error(err); toast("Uploaden mislukt"); }
+  renderRestMenu();
 });
 
 /* ---------- Receptie ---------- */
