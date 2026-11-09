@@ -107,7 +107,7 @@ svg{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-width:
 .meta{display:flex;gap:16px;flex-wrap:wrap;color:var(--muted);font-size:.95rem}
 .deliv{display:inline-flex;align-items:center;gap:12px;margin:16px 0 4px;background:var(--gray);border-radius:999px;padding:9px 16px;font-size:.95rem}
 .textbtn{background:none;border:0;color:var(--link);font-weight:600;padding:0}
-.items{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));margin-top:18px}
+.items{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));margin-top:12px}
 .item{position:relative;display:flex;justify-content:space-between;gap:14px;border:1px solid var(--line);border-radius:12px;padding:14px 14px 14px 18px;min-height:130px}
 .item-name{display:block;font-weight:600;font-size:1.02rem}
 .item-price{display:block;color:var(--muted);margin-top:4px;font-variant-numeric:tabular-nums}
@@ -139,6 +139,19 @@ svg{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-width:
 .track .past i,.track .now i{background:var(--good)}
 .track .now{color:var(--ink)}
 @media (prefers-reduced-motion:no-preference){.track .now i{animation:pulse 1.4s ease-in-out infinite}@keyframes pulse{50%{opacity:.35}}}
+.menu-nav{position:sticky;top:64px;z-index:10;background:var(--bg);display:flex;gap:8px;overflow-x:auto;padding:12px 0;margin-top:6px;scrollbar-width:none}
+.menu-nav::-webkit-scrollbar{display:none}
+.menu-nav .chip{white-space:nowrap}
+.cat-h{font-size:1.35rem;font-weight:800;margin:26px 0 12px;scroll-margin-top:130px}
+.item-main{min-width:0}
+.item-desc{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;color:var(--muted);font-size:.9rem;margin-top:4px}
+.small{font-size:.88rem}
+.upl-row{flex-wrap:wrap}
+.upl-ctl{display:flex;gap:12px;align-items:center;flex-wrap:wrap;width:100%;padding-left:78px}
+.pricebox{display:flex;align-items:center;gap:6px;font-weight:600}
+.field.price{width:104px;padding:9px 12px}
+.switch{display:flex;align-items:center;gap:8px;font-size:.92rem}
+.switch input{width:18px;height:18px}
 .upl{display:grid;gap:0;padding:6px 18px;margin-bottom:6px}
 .upl-row{display:flex;align-items:center;gap:14px;padding:12px 0}
 .upl-row+.upl-row{border-top:1px solid var(--line)}
@@ -349,11 +362,12 @@ const FALLBACK = [
 ];
 
 const T = {
-nl:{staff:"Personeel",deliverTo:"Bezorgen naar kamer",search:"Zoek restaurants",feedTitle:"Bezorging op je kamer",viewCart:"Bekijk winkelmand",cart:"Winkelmand",close:"Sluiten",copyHint:"Kopieer het adres en plak het bij het afrekenen.",goOrder:"Ga naar bestellen",copyAddr:"Kopieer adres",cancel:"Annuleren",all:"Alles",closed:"Gesloten",orderDirect:"Bestel direct",via:"Via {p}",opensAt:"Opent om {t}",noResults:"Geen restaurants gevonden. Probeer een andere zoekterm of categorie.",needRoom:"Vul eerst je kamernummer in",closedToast:"{n} is nu gesloten en opent om {t}",continueTo:"Verder naar {p}",orderingVia:"Je bestelt bij {r} via {p}. Bezorgadres:",room:"kamer",copied:"Adres gekopieerd",copyFail:"Kopiëren lukt niet, selecteer het adres zelf",backToRests:"Terug naar restaurants",freeDelivery:"Gratis bezorging op je kamer",deliveryTo:"Bezorging naar kamer {r}",change:"Wijzig",inCart:"{q} in mand",less:"Minder {n}",more:"Meer {n}",addItem:"Voeg {n} toe",total:"Totaal",deliveryInfo:"Bezorging naar {h}, kamer {r}. Je betaalt bij ontvangst.",orderFor:"Bestel voor {a}",orderFail:"Bestellen mislukt, probeer opnieuw",dbFail:"Database niet bereikbaar, voorbeelddata getoond",payOnReceipt:"Je betaalt bij ontvangst.",stNieuw:"Bestelling ontvangen",stGeaccepteerd:"Het restaurant maakt je bestelling klaar",stOnderweg:"Je bestelling is onderweg",stBezorgd:"Bezorgd, eet smakelijk!",trk0:"Ontvangen",trk1:"Wordt bereid",trk2:"Onderweg",trk3:"Bezorgd",progress:"Voortgang",orderMore:"Nog iets bestellen",trackSoon:"Zodra de bezorger onderweg is, kun je hem hier live volgen.",trackWait:"Wachten op de locatie van de bezorger…",trackDist:"De bezorger is ongeveer {d} van het hotel",trackStale:"Laatst bijgewerkt om {t}",mapAria:"Kaart met de locatie van de bezorger"},
-en:{staff:"Staff",deliverTo:"Deliver to room",search:"Search restaurants",feedTitle:"Delivered to your room",viewCart:"View basket",cart:"Basket",close:"Close",copyHint:"Copy the address and paste it at checkout.",goOrder:"Continue to order",copyAddr:"Copy address",cancel:"Cancel",all:"All",closed:"Closed",orderDirect:"Order direct",via:"Via {p}",opensAt:"Opens at {t}",noResults:"No restaurants found. Try another search or category.",needRoom:"Enter your room number first",closedToast:"{n} is closed right now and opens at {t}",continueTo:"Continue to {p}",orderingVia:"You’re ordering from {r} via {p}. Delivery address:",room:"room",copied:"Address copied",copyFail:"Copy failed, select the address manually",backToRests:"Back to restaurants",freeDelivery:"Free delivery to your room",deliveryTo:"Delivery to room {r}",change:"Change",inCart:"{q} in basket",less:"Remove one {n}",more:"Add one more {n}",addItem:"Add {n}",total:"Total",deliveryInfo:"Delivery to {h}, room {r}. You pay on receipt.",orderFor:"Order for {a}",orderFail:"Order failed, please try again",dbFail:"Database unreachable, showing sample data",payOnReceipt:"You pay on receipt.",stNieuw:"Order received",stGeaccepteerd:"The restaurant is preparing your order",stOnderweg:"Your order is on its way",stBezorgd:"Delivered, enjoy your meal!",trk0:"Received",trk1:"Preparing",trk2:"On its way",trk3:"Delivered",progress:"Progress",orderMore:"Order something else",trackSoon:"Once the courier is on the way, you can follow them live here.",trackWait:"Waiting for the courier’s location…",trackDist:"The courier is about {d} from the hotel",trackStale:"Last updated at {t}",mapAria:"Map showing the courier’s location"},
-de:{staff:"Personal",deliverTo:"Lieferung an Zimmer",search:"Restaurants suchen",feedTitle:"Lieferung auf dein Zimmer",viewCart:"Warenkorb ansehen",cart:"Warenkorb",close:"Schließen",copyHint:"Kopiere die Adresse und füge sie beim Bezahlen ein.",goOrder:"Weiter zur Bestellung",copyAddr:"Adresse kopieren",cancel:"Abbrechen",all:"Alle",closed:"Geschlossen",orderDirect:"Direkt bestellen",via:"Über {p}",opensAt:"Öffnet um {t}",noResults:"Keine Restaurants gefunden. Versuche eine andere Suche oder Kategorie.",needRoom:"Gib zuerst deine Zimmernummer ein",closedToast:"{n} ist gerade geschlossen und öffnet um {t}",continueTo:"Weiter zu {p}",orderingVia:"Du bestellst bei {r} über {p}. Lieferadresse:",room:"Zimmer",copied:"Adresse kopiert",copyFail:"Kopieren fehlgeschlagen, markiere die Adresse selbst",backToRests:"Zurück zu den Restaurants",freeDelivery:"Kostenlose Lieferung auf dein Zimmer",deliveryTo:"Lieferung an Zimmer {r}",change:"Ändern",inCart:"{q} im Warenkorb",less:"Weniger {n}",more:"Mehr {n}",addItem:"{n} hinzufügen",total:"Gesamt",deliveryInfo:"Lieferung an {h}, Zimmer {r}. Du zahlst bei Erhalt.",orderFor:"Bestellen für {a}",orderFail:"Bestellung fehlgeschlagen, bitte erneut versuchen",dbFail:"Datenbank nicht erreichbar, Beispieldaten werden gezeigt",payOnReceipt:"Du zahlst bei Erhalt.",stNieuw:"Bestellung erhalten",stGeaccepteerd:"Das Restaurant bereitet deine Bestellung zu",stOnderweg:"Deine Bestellung ist unterwegs",stBezorgd:"Geliefert, guten Appetit!",trk0:"Erhalten",trk1:"Wird zubereitet",trk2:"Unterwegs",trk3:"Geliefert",progress:"Fortschritt",orderMore:"Noch etwas bestellen",trackSoon:"Sobald der Fahrer unterwegs ist, kannst du ihn hier live verfolgen.",trackWait:"Warte auf den Standort des Fahrers…",trackDist:"Der Fahrer ist etwa {d} vom Hotel entfernt",trackStale:"Zuletzt aktualisiert um {t}",mapAria:"Karte mit dem Standort des Fahrers"}
+nl:{staff:"Personeel",deliverTo:"Bezorgen naar kamer",search:"Zoek restaurants",feedTitle:"Bezorging op je kamer",viewCart:"Bekijk winkelmand",cart:"Winkelmand",close:"Sluiten",copyHint:"Kopieer het adres en plak het bij het afrekenen.",goOrder:"Ga naar bestellen",copyAddr:"Kopieer adres",cancel:"Annuleren",all:"Alles",closed:"Gesloten",orderDirect:"Bestel direct",via:"Via {p}",opensAt:"Opent om {t}",noResults:"Geen restaurants gevonden. Probeer een andere zoekterm of categorie.",needRoom:"Vul eerst je kamernummer in",closedToast:"{n} is nu gesloten. {o}",opensTomorrow:"Opent morgen om {t}",opensDay:"Opent {d} om {t}",noItems:"Dit restaurant heeft nog geen gerechten beschikbaar.",continueTo:"Verder naar {p}",orderingVia:"Je bestelt bij {r} via {p}. Bezorgadres:",room:"kamer",copied:"Adres gekopieerd",copyFail:"Kopiëren lukt niet, selecteer het adres zelf",backToRests:"Terug naar restaurants",freeDelivery:"Gratis bezorging op je kamer",deliveryTo:"Bezorging naar kamer {r}",change:"Wijzig",inCart:"{q} in mand",less:"Minder {n}",more:"Meer {n}",addItem:"Voeg {n} toe",total:"Totaal",deliveryInfo:"Bezorging naar {h}, kamer {r}. Je betaalt bij ontvangst.",orderFor:"Bestel voor {a}",orderFail:"Bestellen mislukt, probeer opnieuw",dbFail:"Database niet bereikbaar, voorbeelddata getoond",payOnReceipt:"Je betaalt bij ontvangst.",stNieuw:"Bestelling ontvangen",stGeaccepteerd:"Het restaurant maakt je bestelling klaar",stOnderweg:"Je bestelling is onderweg",stBezorgd:"Bezorgd, eet smakelijk!",trk0:"Ontvangen",trk1:"Wordt bereid",trk2:"Onderweg",trk3:"Bezorgd",progress:"Voortgang",orderMore:"Nog iets bestellen",trackSoon:"Zodra de bezorger onderweg is, kun je hem hier live volgen.",trackWait:"Wachten op de locatie van de bezorger…",trackDist:"De bezorger is ongeveer {d} van het hotel",trackStale:"Laatst bijgewerkt om {t}",mapAria:"Kaart met de locatie van de bezorger"},
+en:{staff:"Staff",deliverTo:"Deliver to room",search:"Search restaurants",feedTitle:"Delivered to your room",viewCart:"View basket",cart:"Basket",close:"Close",copyHint:"Copy the address and paste it at checkout.",goOrder:"Continue to order",copyAddr:"Copy address",cancel:"Cancel",all:"All",closed:"Closed",orderDirect:"Order direct",via:"Via {p}",opensAt:"Opens at {t}",noResults:"No restaurants found. Try another search or category.",needRoom:"Enter your room number first",closedToast:"{n} is closed right now. {o}",opensTomorrow:"Opens tomorrow at {t}",opensDay:"Opens {d} at {t}",noItems:"This restaurant has no dishes available yet.",continueTo:"Continue to {p}",orderingVia:"You’re ordering from {r} via {p}. Delivery address:",room:"room",copied:"Address copied",copyFail:"Copy failed, select the address manually",backToRests:"Back to restaurants",freeDelivery:"Free delivery to your room",deliveryTo:"Delivery to room {r}",change:"Change",inCart:"{q} in basket",less:"Remove one {n}",more:"Add one more {n}",addItem:"Add {n}",total:"Total",deliveryInfo:"Delivery to {h}, room {r}. You pay on receipt.",orderFor:"Order for {a}",orderFail:"Order failed, please try again",dbFail:"Database unreachable, showing sample data",payOnReceipt:"You pay on receipt.",stNieuw:"Order received",stGeaccepteerd:"The restaurant is preparing your order",stOnderweg:"Your order is on its way",stBezorgd:"Delivered, enjoy your meal!",trk0:"Received",trk1:"Preparing",trk2:"On its way",trk3:"Delivered",progress:"Progress",orderMore:"Order something else",trackSoon:"Once the courier is on the way, you can follow them live here.",trackWait:"Waiting for the courier’s location…",trackDist:"The courier is about {d} from the hotel",trackStale:"Last updated at {t}",mapAria:"Map showing the courier’s location"},
+de:{staff:"Personal",deliverTo:"Lieferung an Zimmer",search:"Restaurants suchen",feedTitle:"Lieferung auf dein Zimmer",viewCart:"Warenkorb ansehen",cart:"Warenkorb",close:"Schließen",copyHint:"Kopiere die Adresse und füge sie beim Bezahlen ein.",goOrder:"Weiter zur Bestellung",copyAddr:"Adresse kopieren",cancel:"Abbrechen",all:"Alle",closed:"Geschlossen",orderDirect:"Direkt bestellen",via:"Über {p}",opensAt:"Öffnet um {t}",noResults:"Keine Restaurants gefunden. Versuche eine andere Suche oder Kategorie.",needRoom:"Gib zuerst deine Zimmernummer ein",closedToast:"{n} ist gerade geschlossen. {o}",opensTomorrow:"Öffnet morgen um {t}",opensDay:"Öffnet {d} um {t}",noItems:"Dieses Restaurant hat noch keine Gerichte verfügbar.",continueTo:"Weiter zu {p}",orderingVia:"Du bestellst bei {r} über {p}. Lieferadresse:",room:"Zimmer",copied:"Adresse kopiert",copyFail:"Kopieren fehlgeschlagen, markiere die Adresse selbst",backToRests:"Zurück zu den Restaurants",freeDelivery:"Kostenlose Lieferung auf dein Zimmer",deliveryTo:"Lieferung an Zimmer {r}",change:"Ändern",inCart:"{q} im Warenkorb",less:"Weniger {n}",more:"Mehr {n}",addItem:"{n} hinzufügen",total:"Gesamt",deliveryInfo:"Lieferung an {h}, Zimmer {r}. Du zahlst bei Erhalt.",orderFor:"Bestellen für {a}",orderFail:"Bestellung fehlgeschlagen, bitte erneut versuchen",dbFail:"Datenbank nicht erreichbar, Beispieldaten werden gezeigt",payOnReceipt:"Du zahlst bei Erhalt.",stNieuw:"Bestellung erhalten",stGeaccepteerd:"Das Restaurant bereitet deine Bestellung zu",stOnderweg:"Deine Bestellung ist unterwegs",stBezorgd:"Geliefert, guten Appetit!",trk0:"Erhalten",trk1:"Wird zubereitet",trk2:"Unterwegs",trk3:"Geliefert",progress:"Fortschritt",orderMore:"Noch etwas bestellen",trackSoon:"Sobald der Fahrer unterwegs ist, kannst du ihn hier live verfolgen.",trackWait:"Warte auf den Standort des Fahrers…",trackDist:"Der Fahrer ist etwa {d} vom Hotel entfernt",trackStale:"Zuletzt aktualisiert um {t}",mapAria:"Karte mit dem Standort des Fahrers"}
 };
-const KIND_TR = {Kip:{en:"Chicken", de:"Hähnchen"}, Chinees:{en:"Chinese", de:"Chinesisch"}};
+const KIND_TR = {Kip:{en:"Chicken", de:"Hähnchen"}, Chinees:{en:"Chinese", de:"Chinesisch"}, Italiaans:{en:"Italian", de:"Italienisch"}};
+const DAYS = {nl:["zondag","maandag","dinsdag","woensdag","donderdag","vrijdag","zaterdag"], en:["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"], de:["Sonntag","Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag"]};
 const LANGS = ["nl","en","de"];
 function detectLang(){
   try{ const sv = localStorage.getItem("lang"); if(LANGS.includes(sv)) return sv; }catch(e){}
@@ -458,8 +472,8 @@ async function loadData(){
     RESTAURANTS = rs.map(r => {
       const f = FALLBACK.find(x => x.id === r.id) || {};
       return {id:r.id, name:r.name, kind:r.kind, time:f.time || "30–40 min", color:f.color || "#3d4a5c",
-        method:r.method, platform:r.platform, url:r.url, rate:Number(r.rate), opens:r.opens, closes:r.closes, tracking:!!r.tracking, image:r.image_url || "",
-        menu: ms.filter(m => m.restaurant_id === r.id).map(m => [m.name, Number(m.price), m.image_url || "", m.id])};
+        method:r.method, platform:r.platform, url:r.url, rate:Number(r.rate), opens:r.opens, closes:r.closes, tracking:!!r.tracking, image:r.image_url || "", hours:r.hours || null,
+        menu: ms.filter(m => m.restaurant_id === r.id).map(m => [m.name, m.price == null ? null : Number(m.price), m.image_url || "", m.id, m.category || "", m.description || "", m.available !== false])};
     });
   }catch(e){ console.error(e); toast(t("dbFail")); }
   state.loaded = true;
@@ -524,19 +538,37 @@ async function refresh(){
 /* ---------- Gast ---------- */
 const hm = t => String(t).slice(0, 5);
 const toMin = t => { const [h, m] = String(t).split(":").map(Number); return h * 60 + m; };
-function nowMin(){
-  const p = new Intl.DateTimeFormat("nl-NL", {timeZone:"Europe/Amsterdam", hour:"2-digit", minute:"2-digit", hourCycle:"h23"}).format(new Date());
-  return toMin(p);
+function nowParts(){
+  const p = new Intl.DateTimeFormat("en-US", {timeZone:"Europe/Amsterdam", weekday:"short", hour:"2-digit", minute:"2-digit", hourCycle:"h23"}).formatToParts(new Date());
+  const g = ty => (p.find(x => x.type === ty) || {}).value;
+  return {day:["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].indexOf(g("weekday")), min:+g("hour") * 60 + +g("minute")};
 }
 function isOpen(r){
+  const n = nowParts();
+  if(r.hours){ return (r.hours[n.day] || []).some(([a, c]) => n.min >= toMin(a) && n.min < toMin(c)); }
   if(!r.opens || !r.closes) return true;
-  const n = nowMin(), a = toMin(r.opens), c = toMin(r.closes);
-  return a <= c ? (n >= a && n < c) : (n >= a || n < c);
+  const a = toMin(r.opens), c = toMin(r.closes);
+  return a <= c ? (n.min >= a && n.min < c) : (n.min >= a || n.min < c);
 }
-const KIND_EMOJI = {Burgers:"🍔", Kip:"🍗", Pizza:"🍕", Snacks:"🍟", Chinees:"🥡"};
+function openText(r){
+  if(r.hours){
+    const n = nowParts();
+    for(let off = 0; off <= 7; off++){
+      const day = (n.day + off) % 7;
+      for(const [a] of (r.hours[day] || [])){
+        if(off === 0 && toMin(a) <= n.min) continue;
+        return off === 0 ? t("opensAt", {t:a}) : off === 1 ? t("opensTomorrow", {t:a}) : t("opensDay", {d:DAYS[state.lang][day], t:a});
+      }
+    }
+    return "";
+  }
+  return r.opens ? t("opensAt", {t:hm(r.opens)}) : "";
+}
+const KIND_EMOJI = {Burgers:"🍔", Kip:"🍗", Pizza:"🍕", Snacks:"🍟", Chinees:"🥡", Italiaans:"🍝"};
+const CAT_EMOJI = [[/pizza/i,"🍕"],[/pasta|risotto|gnocchi/i,"🍝"],[/antipasti/i,"🥗"],[/vis/i,"🐟"],[/vlees/i,"🥩"],[/dessert/i,"🍰"],[/bijgerecht/i,"🥔"]];
 const ITEM_EMOJI = [[/tiramisu/i,"🍰"],[/pizza|margherita|pepperoni|quattro/i,"🍕"],[/friet/i,"🍟"],[/frikandel/i,"🌭"],[/kapsalon/i,"🥙"],[/kroket/i,"🧆"],[/babi|pangang/i,"🍖"],[/nasi/i,"🍛"],[/loempia/i,"🥟"],[/bami/i,"🍜"],[/burger/i,"🍔"],[/kip|chicken/i,"🍗"]];
 const kindEmoji = k => KIND_EMOJI[k] || "🍽️";
-const itemEmoji = (n, k) => { const m = ITEM_EMOJI.find(x => x[0].test(n)); return m ? m[1] : kindEmoji(k); };
+const itemEmoji = (n, k, c) => { const m = (c && CAT_EMOJI.find(x => x[0].test(c))) || ITEM_EMOJI.find(x => x[0].test(n)); return m ? m[1] : kindEmoji(k); };
 const imgTag = u => /^https:\/\//.test(u || "") ? `<img src="${esc(u)}" alt="" loading="lazy" onerror="this.remove()">` : "";
 const tint = (c, a = 18, b = 40) => `linear-gradient(135deg,color-mix(in srgb,${c} ${a}%,#fff),color-mix(in srgb,${c} ${b}%,#fff))`;
 
@@ -559,14 +591,14 @@ function renderRests(){
         ${!open ? `<span class="tag closed">${t("closed")}</span>` : r.method === "direct" ? `<span class="tag direct">${I.check}${t("orderDirect")}</span>` : `<span class="tag">${I.ext}${esc(t("via", {p:r.platform}))}</span>`}
       </div>
       <div class="rest-row"><span class="rest-name">${esc(r.name)}</span><span class="time num">${esc(r.time)}</span></div>
-      <div class="rest-sub">${open ? esc(tk(r.kind)) : t("opensAt", {t:hm(r.opens)})}</div>
+      <div class="rest-sub">${open ? esc(tk(r.kind)) : esc(openText(r))}</div>
     </button>`; }).join("") : `<div class="empty">${t("noResults")}</div>`;
 }
 $("#rests").addEventListener("click", e => { const b = e.target.closest("button.rest"); if(b) pick(b.dataset.id); });
 
 function pick(id){
   const r = find(id);
-  if(!isOpen(r)){ toast(t("closedToast", {n:r.name, t:hm(r.opens)})); return; }
+  if(!isOpen(r)){ toast(t("closedToast", {n:r.name, o:openText(r)})); return; }
   if(!room()){ toast(t("needRoom")); $("#room").focus(); return; }
   if(r.method === "refer"){
     state.pending = r;
@@ -606,25 +638,34 @@ function renderMenu(r){
     <h1 class="store">${esc(r.name)}</h1>
     <div class="meta"><span>${esc(tk(r.kind))}</span><span>${esc(r.time)}</span><span>${t("freeDelivery")}</span></div>
     <div class="deliv"><span>${t("deliveryTo", {r:"<b>" + esc(room()) + "</b>"})}</span><button class="textbtn" id="chg">${t("change")}</button></div>
-    <ul class="items" id="items"></ul>`;
-  renderItems(r);
+    <div class="menu-nav" id="menu-nav"></div><div id="items"></div>`;
+  renderItems(r, true);
 }
-function renderItems(r){
-  $("#items").innerHTML = r.menu.map((m, i) => {
-    const q = state.cart[i] || 0, n = esc(m[0]);
-    return `<li class="item">
-      <div><span class="item-name">${n}</span><span class="item-price">${eur(m[1])}</span>${q ? `<span class="item-count">${t("inCart", {q})}</span>` : ""}</div>
-      <div class="thumb" style="background:${tint(r.color, 14, 30)}" aria-hidden="true">${itemEmoji(m[0], r.kind)}${imgTag(m[2])}
+function itemHtml(r, m, i){
+  const q = state.cart[i] || 0, n = esc(m[0]);
+  return `<li class="item">
+      <div class="item-main"><span class="item-name">${n}</span><span class="item-price">${eur(m[1])}</span>${m[5] ? `<span class="item-desc">${esc(m[5])}</span>` : ""}${q ? `<span class="item-count">${t("inCart", {q})}</span>` : ""}</div>
+      <div class="thumb" style="background:${tint(r.color, 14, 30)}" aria-hidden="true">${itemEmoji(m[0], r.kind, m[4])}${imgTag(m[2])}
         <div class="ctl">${q
           ? `<button data-i="${i}" data-d="-1" aria-label="${t("less", {n})}">${I.minus}</button><output>${q}</output><button data-i="${i}" data-d="1" aria-label="${t("more", {n})}">${I.plus}</button>`
           : `<button data-i="${i}" data-d="1" aria-label="${t("addItem", {n})}">${I.plus}</button>`}</div>
       </div></li>`;
-  }).join("");
+}
+function renderItems(r, withNav){
+  const vis = r.menu.map((m, i) => ({m, i})).filter(x => x.m[1] != null && x.m[6] !== false);
+  const groups = [];
+  vis.forEach(x => { const c = x.m[4] || ""; let g = groups.find(h => h.c === c); if(!g){ g = {c, list:[]}; groups.push(g); } g.list.push(x); });
+  if(withNav) $("#menu-nav").innerHTML = groups.length > 1 ? groups.map((g, k) => `<button class="chip" data-go="c-${k}">${esc(g.c)}</button>`).join("") : "";
+  $("#items").innerHTML = vis.length
+    ? groups.map((g, k) => `${g.c ? `<h3 class="cat-h" id="c-${k}">${esc(g.c)}</h3>` : ""}<ul class="items">${g.list.map(({m, i}) => itemHtml(r, m, i)).join("")}</ul>`).join("")
+    : `<div class="empty">${t("noItems")}</div>`;
 }
 $("#g-menu").addEventListener("click", e => {
   const r = state.open ? find(state.open) : null; if(!r) return;
   if(e.target.closest("#back")){ state.open = null; state.cart = {}; renderGuest(); return; }
   if(e.target.closest("#chg")){ state.open = null; state.cart = {}; renderGuest(); $("#room").focus(); return; }
+  const go2 = e.target.closest("[data-go]");
+  if(go2){ const el = document.getElementById(go2.dataset.go); if(el) el.scrollIntoView({behavior:"smooth", block:"start"}); return; }
   const b = e.target.closest("button[data-d]"); if(!b) return;
   const i = +b.dataset.i; state.cart[i] = Math.max(0, (state.cart[i] || 0) + (+b.dataset.d));
   renderItems(r); updateCart();
@@ -781,20 +822,48 @@ const uploadBtn = key => `<label class="btn ghost upl-btn"><span>Foto kiezen</sp
 function renderRestMenu(){
   const r = find(state.auth.restaurant_id); if(!r) return;
   state.menuDrawn = true;
+  const groups = [];
+  r.menu.forEach(m => { const c = m[4] || "Gerechten"; let g = groups.find(h => h.c === c); if(!g){ g = {c, list:[]}; groups.push(g); } g.list.push(m); });
+  const missing = r.menu.filter(m => m[1] == null).length;
   $("#rest-menu").innerHTML = `
     <div class="panel upl"><div class="upl-row">
       <div class="upl-img" style="background:${tint(r.color)}">${kindEmoji(r.kind)}${imgTag(r.image)}</div>
       <div class="grow"><strong>Omslagfoto</strong><div class="muted">Bovenaan je restaurant in de app</div></div>${uploadBtn("rest:" + r.id)}</div></div>
-    <div class="sec-head"><h2>Gerechten</h2></div>
-    <div class="panel upl">${r.menu.map(m => `<div class="upl-row">
-      <div class="upl-img" style="background:${tint(r.color, 14, 30)}">${itemEmoji(m[0], r.kind)}${imgTag(m[2])}</div>
-      <div class="grow"><strong>${esc(m[0])}</strong><div class="muted num">${eur(m[1])}</div></div>${m[3] != null ? uploadBtn("item:" + m[3]) : ""}</div>`).join("")}</div>
+    ${missing ? `<div class="info" style="margin:14px 0">${missing === 1 ? "1 gerecht heeft" : missing + " gerechten hebben"} nog geen prijs. Gasten zien een gerecht pas als je een prijs invult.</div>` : ""}
+    ${groups.map(g => `<div class="sec-head"><h2>${esc(g.c)}</h2></div><div class="panel upl">${g.list.map(m => `<div class="upl-row">
+      <div class="upl-img" style="background:${tint(r.color, 14, 30)}">${itemEmoji(m[0], r.kind, m[4])}${imgTag(m[2])}</div>
+      <div class="grow"><strong>${esc(m[0])}</strong>${m[5] ? `<div class="muted small">${esc(m[5])}</div>` : ""}</div>
+      ${m[3] != null ? `<div class="upl-ctl">
+        <label class="pricebox">€ <input class="field price" type="number" min="0" step="0.01" inputmode="decimal" value="${m[1] == null ? "" : m[1]}" placeholder="Prijs" data-price="${m[3]}" aria-label="Prijs ${esc(m[0])}"></label>
+        <label class="switch"><input type="checkbox" data-avail="${m[3]}" ${m[6] !== false ? "checked" : ""}><span>Beschikbaar</span></label>
+        ${uploadBtn("item:" + m[3])}</div>` : ""}
+    </div>`).join("")}</div>`).join("")}
     <p class="muted" style="margin-top:12px">Gebruik alleen foto’s waarvan je het recht hebt om ze te gebruiken. Foto’s worden automatisch verkleind.</p>`;
 }
 $("#rest-tabs").addEventListener("click", e => { const b = e.target.closest("[data-tab]"); if(b){ state.restTab = b.dataset.tab; state.menuDrawn = false; renderRestView(); } });
+const findItem = (rid, id) => find(rid).menu.find(x => String(x[3]) === String(id));
+async function patchItem(id, body){
+  const rows = await sb("menu_items?id=eq." + encodeURIComponent(id), {method:"PATCH", body:JSON.stringify(body)});
+  if(!rows || !rows.length) throw new Error("Geen rechten om dit op te slaan");
+}
 $("#rest-menu").addEventListener("change", async e => {
+  const rid = state.auth.restaurant_id;
+  const pr = e.target.closest("input[data-price]");
+  if(pr){
+    const raw = pr.value.trim().replace(",", "."), v = raw === "" ? null : Math.round(parseFloat(raw) * 100) / 100;
+    if(v !== null && (isNaN(v) || v < 0)){ toast("Ongeldige prijs"); return; }
+    try{ await patchItem(pr.dataset.price, {price:v}); findItem(rid, pr.dataset.price)[1] = v; toast("Prijs opgeslagen"); }
+    catch(err){ console.error(err); toast("Opslaan mislukt"); }
+    renderRestMenu(); return;
+  }
+  const av = e.target.closest("input[data-avail]");
+  if(av){
+    try{ await patchItem(av.dataset.avail, {available:av.checked}); findItem(rid, av.dataset.avail)[6] = av.checked; toast(av.checked ? "Gerecht beschikbaar" : "Gerecht uitgezet"); }
+    catch(err){ console.error(err); toast("Opslaan mislukt"); }
+    renderRestMenu(); return;
+  }
   const inp = e.target.closest("input[data-up]"); if(!inp || !inp.files[0]) return;
-  const [kind, id] = inp.dataset.up.split(":"), file = inp.files[0], rid = state.auth.restaurant_id;
+  const [kind, id] = inp.dataset.up.split(":"), file = inp.files[0];
   inp.closest("label").firstElementChild.textContent = "Bezig…"; inp.disabled = true;
   try{
     const blob = await resizeImage(file, 1000);
@@ -803,10 +872,11 @@ $("#rest-menu").addEventListener("change", async e => {
       headers:{apikey:SB_KEY, Authorization:"Bearer " + state.auth.token, "Content-Type":"image/jpeg"}, body:blob});
     if(!up.ok) throw new Error(await up.text());
     const url = SB_URL + "/storage/v1/object/public/fotos/" + path;
-    const rows = await sb((kind === "rest" ? "restaurants" : "menu_items") + "?id=eq." + encodeURIComponent(id), {method:"PATCH", body:JSON.stringify({image_url:url})});
-    if(!rows || !rows.length) throw new Error("Geen rechten om dit op te slaan");
-    if(kind === "rest") find(id).image = url;
-    else { const m = find(rid).menu.find(x => String(x[3]) === id); if(m) m[2] = url; }
+    if(kind === "rest"){
+      const rows = await sb("restaurants?id=eq." + encodeURIComponent(id), {method:"PATCH", body:JSON.stringify({image_url:url})});
+      if(!rows || !rows.length) throw new Error("Geen rechten om dit op te slaan");
+      find(id).image = url;
+    }else{ await patchItem(id, {image_url:url}); const m = findItem(rid, id); if(m) m[2] = url; }
     toast("Foto opgeslagen");
   }catch(err){ console.error(err); toast("Uploaden mislukt"); }
   renderRestMenu();
