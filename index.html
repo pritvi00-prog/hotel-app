@@ -5,152 +5,157 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Hotel Maashaven – Bestel uit de buurt</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#f3f5f8; --surface:#ffffff; --ink:#0e1726; --muted:#5b6a7d; --line:#e2e7ee;
-  --accent:#2b3fe0; --accent-ink:#ffffff; --accent-soft:#e8ebfd;
-  --good:#0f7b5f; --good-soft:#dff3ec; --warn:#a85a00; --warn-soft:#fbecd5;
-  --plate:#0e1726; --plate-ink:#f3f5f8; --shadow:0 12px 32px rgba(14,23,38,.16);
-  --display:"Bricolage Grotesque","Instrument Sans",system-ui,sans-serif;
-  --r-s:10px; --r-m:16px; --r-l:24px;
+  --bg:#ffffff; --surface:#ffffff; --ink:#000000; --muted:#545454; --line:#e6e6e6; --gray:#f3f3f3;
+  --btn:#000000; --btn-ink:#ffffff; --link:#276ef1;
+  --good:#05944f; --good-soft:#e3f6ec; --warn:#a85a00; --warn-soft:#fdf0dc;
+  --shadow:0 4px 16px rgba(0,0,0,.18);
+  --font:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   color-scheme:light;
 }
 @media (prefers-color-scheme: dark){
   :root{
-    --bg:#0a1220; --surface:#111c2e; --ink:#eaf0f8; --muted:#92a1b6; --line:#223049;
-    --accent:#8c9bff; --accent-ink:#0a1220; --accent-soft:#1b2750;
-    --good:#4fd1a5; --good-soft:#123a30; --warn:#f0b35a; --warn-soft:#3b2a0e;
-    --plate:#16233a; --plate-ink:#eaf0f8; --shadow:0 12px 32px rgba(0,0,0,.5);
+    --bg:#000000; --surface:#141414; --ink:#ffffff; --muted:#a6a6a6; --line:#2b2b2b; --gray:#1f1f1f;
+    --btn:#ffffff; --btn-ink:#000000; --link:#6ea0ff;
+    --good:#3ecf8e; --good-soft:#0f2e20; --warn:#f0b35a; --warn-soft:#33250c;
+    --shadow:0 4px 16px rgba(0,0,0,.6);
     color-scheme:dark;
   }
 }
 *,*::before,*::after{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.5 "Instrument Sans",system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
-h1,h2,h3{font-family:var(--display);margin:0;letter-spacing:-.02em;line-height:1.1}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.45 var(--font);-webkit-font-smoothing:antialiased}
+h1,h2,h3{margin:0;letter-spacing:-.02em;line-height:1.15;font-weight:700}
 button{font:inherit;color:inherit;cursor:pointer}
 ul{list-style:none;margin:0;padding:0}
 p{margin:0}
 .muted{color:var(--muted)}
 .num{font-variant-numeric:tabular-nums}
 .hidden{display:none !important}
-:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
-svg{width:18px;height:18px;flex:none;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+:focus-visible{outline:3px solid var(--link);outline-offset:2px}
+svg{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 
 /* Bovenbalk */
-.bar{position:sticky;top:0;z-index:15;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
-.bar-in{max-width:1040px;margin:0 auto;padding:0 20px;height:60px;display:flex;align-items:center;justify-content:space-between;gap:12px}
-.brand{display:flex;align-items:center;gap:10px;font:800 1.05rem var(--display);letter-spacing:-.01em}
-.mark{width:32px;height:32px;border-radius:10px;background:var(--ink);color:var(--bg);display:grid;place-items:center;font:800 1rem var(--display)}
-.nav{display:flex;gap:4px}
-.link{background:none;border:0;font-weight:600;padding:8px 12px;border-radius:var(--r-s)}
-.link:hover{background:var(--chip,color-mix(in srgb,var(--ink) 7%,transparent))}
-
-.wrap{max-width:1040px;margin:0 auto;padding:24px 20px 140px}
+.bar{position:sticky;top:0;z-index:15;background:var(--bg);border-bottom:1px solid var(--line)}
+.bar-in{max-width:1120px;margin:0 auto;padding:0 20px;height:64px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.2rem;letter-spacing:-.03em}
+.mark{width:32px;height:32px;border-radius:8px;background:var(--btn);color:var(--btn-ink);display:grid;place-items:center;font-weight:800}
+.nav{display:flex;gap:6px}
+.link{background:var(--gray);border:0;font-weight:600;padding:9px 16px;border-radius:999px;font-size:.95rem}
+.link:hover{filter:brightness(.95)}
+.wrap{max-width:1120px;margin:0 auto;padding:20px 20px 140px}
 
 /* Knoppen */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:12px;padding:12px 18px;font-weight:600;background:var(--accent);color:var(--accent-ink);transition:filter .15s}
-.btn:hover{filter:brightness(1.08)}
-.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
-.btn.good{background:var(--good);color:#fff}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:999px;padding:14px 22px;font-weight:600;background:var(--btn);color:var(--btn-ink)}
+.btn:hover{filter:brightness(1.25)}
+.btn.ghost{background:var(--gray);color:var(--ink)}
 .btn.block{width:100%}
+.btn[disabled]{opacity:.5}
 
-/* Hero: kamerplaat */
-.plate{background:var(--plate);color:var(--plate-ink);border-radius:var(--r-l);padding:28px;display:grid;gap:26px;align-items:center}
-.plate h1{font-size:clamp(2rem,5.5vw,3.2rem);font-weight:800;max-width:14ch}
-.plate p{opacity:.78;margin-top:12px;max-width:38ch}
-.roomcard{border:1px solid color-mix(in srgb,var(--plate-ink) 26%,transparent);border-radius:20px;padding:16px 20px 12px;text-align:center;background:color-mix(in srgb,var(--plate-ink) 6%,transparent)}
-.roomcard:focus-within{outline:3px solid color-mix(in srgb,var(--plate-ink) 75%,transparent);outline-offset:2px}
-.roomcard label{display:block;font-size:.92rem;opacity:.78}
-.roomcard input{width:100%;background:transparent;border:0;color:inherit;font:800 3.6rem/1.1 var(--display);text-align:center;letter-spacing:-.02em;outline:none}
-.roomcard input::placeholder{opacity:.28}
-@media (min-width:760px){.plate{grid-template-columns:1.4fr 1fr;padding:44px}}
+/* Adres + zoeken */
+.pills{display:grid;gap:10px;grid-template-columns:1fr}
+@media (min-width:760px){.pills{grid-template-columns:1fr 1.4fr}}
+.field-pill{display:flex;align-items:center;gap:10px;background:var(--gray);border-radius:999px;padding:0 18px;height:50px}
+.field-pill input{flex:1;min-width:0;background:transparent;border:0;color:var(--ink);font:inherit;height:100%;outline:none}
+.field-pill:focus-within{outline:2px solid var(--ink)}
+.field-pill label{color:var(--muted);white-space:nowrap}
+.field-pill #room{max-width:70px;font-weight:700;text-align:left}
+.field-pill input::placeholder{color:var(--muted);opacity:1;font-weight:400}
 
-/* Koppen */
-.sec-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:36px 0 16px}
-.sec-head h2{font-size:1.5rem;font-weight:700}
+/* Categorieën */
+.cats{display:flex;gap:18px;overflow-x:auto;padding:22px 2px 6px;scrollbar-width:none}
+.cats::-webkit-scrollbar{display:none}
+.cat{background:none;border:0;display:grid;justify-items:center;gap:8px;min-width:68px;font-weight:600;font-size:.9rem;padding:0}
+.cat-ic{width:64px;height:64px;border-radius:50%;background:var(--gray);display:grid;place-items:center;font-size:1.8rem}
+.cat[aria-pressed="true"] .cat-ic{outline:2px solid var(--ink);outline-offset:2px}
+
+.sec-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:26px 0 16px}
+.sec-head h2{font-size:1.5rem}
 
 /* Restaurantkaarten */
-.rests{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
-.rest{display:grid;grid-template-columns:56px 1fr 18px;gap:14px;align-items:center;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-m);padding:16px;transition:border-color .15s,transform .15s}
-.rest:hover{border-color:var(--accent)}
-.rest>svg{color:var(--muted)}
-.logo{width:56px;height:56px;border-radius:14px;display:grid;place-items:center;font:800 1.4rem var(--display);color:#fff}
-.logo.lg{width:64px;height:64px;font-size:1.6rem}
-.rest-name{display:block;font:700 1.12rem var(--display);letter-spacing:-.01em}
-.meta{display:flex;gap:14px;flex-wrap:wrap;color:var(--muted);font-size:.9rem;margin-top:2px}
-.meta span{display:inline-flex;align-items:center;gap:5px}
-.meta svg{width:14px;height:14px}
-.badge{display:inline-flex;align-items:center;gap:5px;margin-top:8px;font-size:.82rem;font-weight:600;padding:3px 10px;border-radius:999px;background:var(--accent-soft);color:var(--accent)}
-.badge svg{width:13px;height:13px}
-.badge.direct{background:var(--good-soft);color:var(--good)}
-.skel{min-height:90px;border:0;background:linear-gradient(90deg,var(--line),color-mix(in srgb,var(--line) 40%,var(--surface)),var(--line));background-size:200% 100%}
+.rests{display:grid;gap:26px 20px;grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
+.rest{display:block;text-align:left;background:none;border:0;padding:0}
+.cover{position:relative;height:170px;border-radius:12px;display:grid;place-items:center;font-size:4.2rem;overflow:hidden}
+.rest:hover .cover{filter:brightness(.96)}
+.tag{position:absolute;left:10px;top:10px;background:var(--bg);color:var(--ink);border-radius:999px;padding:4px 10px;font-size:.78rem;font-weight:700;display:inline-flex;gap:5px;align-items:center}
+.tag svg{width:13px;height:13px}
+.tag.direct{background:var(--good);color:#fff}
+.rest-row{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:10px}
+.rest-name{font-weight:700;font-size:1.05rem}
+.time{background:var(--gray);border-radius:999px;padding:3px 10px;font-size:.82rem;font-weight:600;white-space:nowrap}
+.rest-sub{color:var(--muted);font-size:.9rem;margin-top:2px}
+.skel{height:230px;border-radius:12px;background:linear-gradient(90deg,var(--gray),var(--line),var(--gray));background-size:200% 100%}
 @media (prefers-reduced-motion:no-preference){.skel{animation:sh 1.3s linear infinite}@keyframes sh{to{background-position:-200% 0}}}
+.empty{border:1.5px dashed var(--line);border-radius:12px;padding:36px 20px;text-align:center;color:var(--muted);grid-column:1/-1}
 
-/* Menu */
-.back{display:inline-flex;align-items:center;gap:6px;background:none;border:0;font-weight:600;color:var(--muted);padding:6px 0;margin-bottom:12px}
-.back:hover{color:var(--ink)}
-.mhead{display:flex;gap:16px;align-items:center}
-.mhead h2{font-size:1.9rem;font-weight:800}
-.deliv{margin:16px 0 8px;padding:12px 16px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-s);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
-.textbtn{background:none;border:0;color:var(--accent);font-weight:600;padding:0}
-.items{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-m);margin-top:12px}
-.item{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:16px 18px}
-.item+.item{border-top:1px solid var(--line)}
-.item-name{display:block;font-weight:600}
-.item-price{color:var(--muted);font-variant-numeric:tabular-nums}
-.add{display:inline-flex;align-items:center;gap:6px;background:var(--accent-soft);color:var(--accent);border:0;border-radius:999px;padding:8px 14px;font-weight:600}
-.step{display:inline-flex;align-items:center;gap:4px;background:var(--accent-soft);border-radius:999px;padding:3px}
-.step button{width:34px;height:34px;border-radius:50%;border:0;background:var(--surface);color:var(--accent);display:grid;place-items:center}
-.step output{min-width:28px;text-align:center;font-weight:700;font-variant-numeric:tabular-nums}
+/* Winkelpagina */
+.banner{position:relative;height:200px;border-radius:12px;display:grid;place-items:center;font-size:5.5rem;overflow:hidden}
+.round{position:absolute;left:14px;top:14px;width:42px;height:42px;border-radius:50%;border:0;background:var(--bg);color:var(--ink);display:grid;place-items:center;box-shadow:var(--shadow)}
+.store{font-size:2.1rem;font-weight:800;margin:18px 0 6px}
+.meta{display:flex;gap:16px;flex-wrap:wrap;color:var(--muted);font-size:.95rem}
+.deliv{display:inline-flex;align-items:center;gap:12px;margin:16px 0 4px;background:var(--gray);border-radius:999px;padding:9px 16px;font-size:.95rem}
+.textbtn{background:none;border:0;color:var(--link);font-weight:600;padding:0}
+.items{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));margin-top:18px}
+.item{position:relative;display:flex;justify-content:space-between;gap:14px;border:1px solid var(--line);border-radius:12px;padding:14px 14px 14px 18px;min-height:130px}
+.item-name{display:block;font-weight:600;font-size:1.02rem}
+.item-price{display:block;color:var(--muted);margin-top:4px;font-variant-numeric:tabular-nums}
+.item-count{display:inline-block;margin-top:8px;background:var(--gray);border-radius:999px;font-size:.8rem;font-weight:700;padding:2px 10px}
+.thumb{position:relative;width:104px;height:104px;border-radius:10px;display:grid;place-items:center;font-size:2.6rem;flex:none;align-self:center}
+.ctl{position:absolute;right:6px;bottom:6px;font-size:1rem;line-height:1;display:flex;align-items:center;background:var(--bg);color:var(--ink);border-radius:999px;box-shadow:var(--shadow)}
+.ctl button{width:34px;height:34px;border-radius:50%;border:0;background:transparent;color:inherit;display:grid;place-items:center}
+.ctl output{min-width:22px;text-align:center;font-weight:700;font-variant-numeric:tabular-nums}
 
 /* Winkelmand */
-.cart{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));max-width:640px;margin:0 auto;background:var(--ink);color:var(--bg);border-radius:20px;padding:10px 10px 10px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;box-shadow:var(--shadow);z-index:20}
-.cart small{display:block;opacity:.7}
-.cart strong{font-size:1.1rem;font-variant-numeric:tabular-nums}
+.cartbar{position:fixed;left:12px;right:12px;bottom:calc(14px + env(safe-area-inset-bottom,0px));max-width:560px;margin:0 auto;z-index:20}
+.cartbtn{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--btn);color:var(--btn-ink);border:0;border-radius:999px;padding:14px 20px;font-weight:700;box-shadow:var(--shadow)}
+.count{background:var(--btn-ink);color:var(--btn);border-radius:50%;width:26px;height:26px;display:grid;place-items:center;font-size:.85rem}
+.sheet-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.x{width:38px;height:38px;border-radius:50%;border:0;background:var(--gray);display:grid;place-items:center}
+.lines li{display:grid;grid-template-columns:34px 1fr auto;gap:8px;padding:6px 0}
+.lines li span:first-child{color:var(--muted);font-variant-numeric:tabular-nums}
+.total{display:flex;justify-content:space-between;font-weight:700;font-size:1.1rem;border-top:1px solid var(--line);padding-top:12px}
+.info{background:var(--gray);border-radius:12px;padding:12px 14px;font-size:.93rem}
 
 /* Bevestiging */
 .done{max-width:520px;margin:40px auto 0;text-align:center;display:grid;gap:16px;justify-items:center}
-.done-icon{width:72px;height:72px;border-radius:50%;background:var(--good-soft);color:var(--good);display:grid;place-items:center}
-.done-icon svg{width:34px;height:34px;stroke-width:2.5}
+.done-icon{width:76px;height:76px;border-radius:50%;background:var(--good);color:#fff;display:grid;place-items:center}
+.done-icon svg{width:38px;height:38px;stroke-width:3}
 .done h2{font-size:2rem;font-weight:800}
-.summary{width:100%;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-m);padding:6px 18px}
+.summary{width:100%;text-align:left;border:1px solid var(--line);border-radius:12px;padding:6px 18px}
 .summary li{display:flex;justify-content:space-between;gap:12px;padding:10px 0}
 .summary li+li{border-top:1px solid var(--line)}
 .summary .tot{font-weight:700}
 
 /* Dashboard */
-.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
-.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 14px;font-weight:600;color:var(--muted)}
-.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-.chip b{margin-left:6px;font-variant-numeric:tabular-nums}
-.orders{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(310px,1fr))}
-.order{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-m);padding:18px;display:grid;gap:14px;align-content:start}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.chip{border:0;background:var(--gray);border-radius:999px;padding:9px 16px;font-weight:600}
+.chip[aria-pressed="true"]{background:var(--btn);color:var(--btn-ink)}
+.chip b{margin-left:8px;font-variant-numeric:tabular-nums}
+.orders{display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(310px,1fr))}
+.order{border:1px solid var(--line);border-radius:12px;padding:18px;display:grid;gap:14px;align-content:start}
 .order header{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
-.order h3{font-size:1.35rem;font-weight:800}
-.pill{font-size:.82rem;font-weight:600;padding:3px 12px;border-radius:999px;background:var(--accent-soft);color:var(--accent);white-space:nowrap}
+.order h3{font-size:1.4rem;font-weight:800}
+.pill{font-size:.82rem;font-weight:700;padding:4px 12px;border-radius:999px;background:var(--gray);white-space:nowrap}
 .pill.s-Nieuw{background:var(--warn-soft);color:var(--warn)}
 .pill.s-Bezorgd{background:var(--good-soft);color:var(--good)}
-.lines li{display:grid;grid-template-columns:34px 1fr auto;gap:8px;padding:3px 0}
-.lines li span:first-child{color:var(--muted);font-variant-numeric:tabular-nums}
 .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
 .steps i{height:5px;border-radius:3px;background:var(--line)}
 .steps i.on{background:var(--good)}
 .order footer{display:flex;justify-content:space-between;align-items:center;gap:10px}
-.empty{border:1.5px dashed var(--line);border-radius:var(--r-m);padding:36px 20px;text-align:center;color:var(--muted);grid-column:1/-1}
 
 /* Hotel */
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
-.stat{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-m);padding:18px}
+.stat{background:var(--gray);border-radius:12px;padding:18px}
 .stat span{color:var(--muted);font-size:.92rem}
-.stat b{display:block;font:800 2rem var(--display);letter-spacing:-.02em;margin-top:2px;font-variant-numeric:tabular-nums}
-.stat.hl{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.stat b{display:block;font-size:2rem;font-weight:800;letter-spacing:-.02em;margin-top:2px;font-variant-numeric:tabular-nums}
+.stat.hl{background:var(--btn);color:var(--btn-ink)}
 .stat.hl span{color:inherit;opacity:.75}
-.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-m);padding:18px}
+.panel{border:1px solid var(--line);border-radius:12px;padding:18px}
 .bars{display:grid;gap:14px}
 .bar-row{display:grid;grid-template-columns:150px 1fr 90px;gap:12px;align-items:center}
-.bar-track{height:10px;background:var(--line);border-radius:5px;overflow:hidden}
-.bar-fill{height:100%;background:var(--accent);border-radius:5px}
+.bar-track{height:10px;background:var(--gray);border-radius:5px;overflow:hidden}
+.bar-fill{height:100%;background:var(--good);border-radius:5px}
 .bar-val{text-align:right;font-weight:600;font-variant-numeric:tabular-nums}
 .scroll{overflow-x:auto}
 table{width:100%;border-collapse:collapse;min-width:540px}
@@ -161,22 +166,21 @@ tr:last-child td{border-bottom:0}
 
 /* Inloggen */
 .login{max-width:420px;margin:40px auto 0;display:grid;gap:14px}
-.login h2{font-size:1.9rem;font-weight:800}
-.field{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:13px 14px;width:100%}
+.login h2{font-size:2rem;font-weight:800}
+.field{font:inherit;color:var(--ink);background:var(--gray);border:0;border-radius:12px;padding:15px 16px;width:100%}
 .err{color:var(--warn);font-weight:600;min-height:1.4em}
 
 /* Modal */
-.modal{position:fixed;inset:0;background:rgba(8,14,26,.55);display:none;align-items:flex-end;justify-content:center;padding:14px;z-index:30}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:flex-end;justify-content:center;z-index:30}
 .modal.open{display:flex}
-.sheet{background:var(--surface);border-radius:var(--r-l);padding:26px;max-width:460px;width:100%;display:grid;gap:14px;box-shadow:var(--shadow)}
+.sheet{background:var(--surface);border-radius:20px 20px 0 0;padding:24px;max-width:520px;width:100%;display:grid;gap:14px;max-height:90vh;overflow:auto}
 .sheet h3{font-size:1.5rem;font-weight:800}
-.addr{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-weight:600}
+.addr{background:var(--gray);border-radius:12px;padding:12px 14px;font-weight:600}
 .row{display:flex;gap:10px;flex-wrap:wrap}
-@media (min-width:700px){.modal{align-items:center}}
+@media (min-width:700px){.modal{align-items:center;padding:14px}.sheet{border-radius:20px}}
 
-.toast{position:fixed;left:50%;top:72px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:11px 20px;border-radius:999px;font-weight:600;display:none;z-index:40;box-shadow:var(--shadow);max-width:92vw}
+.toast{position:fixed;left:50%;top:76px;transform:translateX(-50%);background:var(--btn);color:var(--btn-ink);padding:11px 20px;border-radius:999px;font-weight:600;display:none;z-index:40;box-shadow:var(--shadow);max-width:92vw}
 .toast.show{display:block}
-@media (prefers-reduced-motion:no-preference){.toast.show{animation:pop .22s ease-out}@keyframes pop{from{opacity:0;transform:translate(-50%,-8px)}}}
 </style>
 </head>
 <body>
@@ -199,17 +203,12 @@ tr:last-child td{border-bottom:0}
   <!-- GAST -->
   <section id="v-guest">
     <div id="g-list">
-      <div class="plate">
-        <div>
-          <h1>Honger? Bestel uit de buurt.</h1>
-          <p>Kies een restaurant en we brengen het naar je kamer.</p>
-        </div>
-        <div class="roomcard">
-          <label for="room">Jouw kamernummer</label>
-          <input id="room" inputmode="numeric" maxlength="4" placeholder="304" autocomplete="off">
-        </div>
+      <div class="pills">
+        <div class="field-pill"><svg viewBox="0 0 24 24"><path d="M12 21s7-6.2 7-11a7 7 0 10-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><label for="room">Bezorgen naar kamer</label><input id="room" inputmode="numeric" maxlength="4" placeholder="304" autocomplete="off"></div>
+        <div class="field-pill"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input id="search" type="search" placeholder="Zoek restaurants" aria-label="Zoek restaurants" autocomplete="off"></div>
       </div>
-      <div class="sec-head"><h2>Restaurants in de buurt</h2></div>
+      <div class="cats" id="cats"></div>
+      <div class="sec-head"><h2>Bezorging op je kamer</h2><span class="muted">Hotel Maashaven</span></div>
       <div class="rests" id="rests"></div>
     </div>
     <div id="g-menu" class="hidden"></div>
@@ -254,9 +253,16 @@ tr:last-child td{border-bottom:0}
   </section>
 </main>
 
-<div class="cart hidden" id="cart">
-  <div><strong id="cart-t"></strong><small id="cart-n"></small></div>
-  <button class="btn" id="place">Bestel naar kamer <span id="place-room"></span></button>
+<div class="cartbar hidden" id="cart">
+  <button class="cartbtn" id="open-cart"><span class="count" id="cart-c">0</span><span>Bekijk winkelmand</span><span class="num" id="cart-t"></span></button>
+</div>
+
+<div class="modal" id="csheet" role="dialog" aria-modal="true" aria-labelledby="c-title">
+  <div class="sheet">
+    <div class="sheet-head"><h3 id="c-title">Winkelmand</h3><button class="x" id="c-close" aria-label="Sluiten"></button></div>
+    <div id="c-body" style="display:grid;gap:14px"></div>
+    <button class="btn block" id="place">Bestellen</button>
+  </div>
 </div>
 
 <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="m-title">
@@ -289,6 +295,7 @@ const I = {
   minus:'<svg viewBox="0 0 24 24"><path d="M5 12h14"/></svg>',
   check:'<svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>',
   clock:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+  x:'<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>',
   bag:'<svg viewBox="0 0 24 24"><path d="M6 8h12l-1 12H7L6 8zM9 8a3 3 0 016 0"/></svg>'
 };
 
@@ -300,7 +307,7 @@ const FALLBACK = [
   {id:"wok", name:"Wok Palace", kind:"Chinees", time:"30–45 min", color:"#6a2a8a", method:"direct", rate:0.12, menu:[["Babi pangang",11.9],["Nasi goreng",10.5],["Loempia’s (4x)",5.5],["Bami goreng",10.5]]}
 ];
 
-const state = {view:"guest", open:null, cart:{}, orders:[], pending:null, filter:"Actief", done:null, loaded:false, auth:null};
+const state = {view:"guest", open:null, cart:{}, orders:[], pending:null, filter:"Actief", done:null, loaded:false, auth:null, cat:"Alles", q:"", cartOpen:false};
 let RESTAURANTS = FALLBACK;
 const find = id => RESTAURANTS.find(r => r.id === id);
 const room = () => ($("#room").value || "").trim();
@@ -384,21 +391,33 @@ async function refresh(){
 }
 
 /* ---------- Gast ---------- */
+const KIND_EMOJI = {Burgers:"🍔", Kip:"🍗", Pizza:"🍕", Snacks:"🍟", Chinees:"🥡"};
+const ITEM_EMOJI = [[/tiramisu/i,"🍰"],[/pizza|margherita|pepperoni|quattro/i,"🍕"],[/friet/i,"🍟"],[/frikandel/i,"🌭"],[/kapsalon/i,"🥙"],[/kroket/i,"🧆"],[/babi|pangang/i,"🍖"],[/nasi/i,"🍛"],[/loempia/i,"🥟"],[/bami/i,"🍜"],[/burger/i,"🍔"],[/kip|chicken/i,"🍗"]];
+const kindEmoji = k => KIND_EMOJI[k] || "🍽️";
+const itemEmoji = (n, k) => { const m = ITEM_EMOJI.find(x => x[0].test(n)); return m ? m[1] : kindEmoji(k); };
+const tint = (c, a = 18, b = 40) => `linear-gradient(135deg,color-mix(in srgb,${c} ${a}%,#fff),color-mix(in srgb,${c} ${b}%,#fff))`;
+
+function renderCats(){
+  const kinds = ["Alles", ...new Set(RESTAURANTS.map(r => r.kind))];
+  $("#cats").innerHTML = kinds.map(k =>
+    `<button class="cat" data-c="${esc(k)}" aria-pressed="${state.cat === k}"><span class="cat-ic">${k === "Alles" ? "🍽️" : kindEmoji(k)}</span><span>${esc(k)}</span></button>`).join("");
+}
+$("#cats").addEventListener("click", e => { const b = e.target.closest("[data-c]"); if(b){ state.cat = b.dataset.c; renderCats(); renderRests(); } });
+$("#search").addEventListener("input", e => { state.q = e.target.value.trim().toLowerCase(); renderRests(); });
+
 function renderRests(){
   const el = $("#rests");
-  if(!state.loaded){ el.innerHTML = '<div class="rest skel"></div>'.repeat(4); return; }
-  el.innerHTML = RESTAURANTS.map(r => `
+  if(!state.loaded){ el.innerHTML = '<div class="skel"></div>'.repeat(3); return; }
+  renderCats();
+  const list = RESTAURANTS.filter(r => (state.cat === "Alles" || r.kind === state.cat) && (!state.q || (r.name + " " + r.kind).toLowerCase().includes(state.q)));
+  el.innerHTML = list.length ? list.map(r => `
     <button class="rest" data-id="${esc(r.id)}">
-      <span class="logo" style="background:${esc(r.color)}" aria-hidden="true">${esc(r.name[0])}</span>
-      <span>
-        <span class="rest-name">${esc(r.name)}</span>
-        <span class="meta"><span>${esc(r.kind)}</span><span>${I.clock}${esc(r.time)}</span></span>
-        ${r.method === "direct"
-          ? `<span class="badge direct">${I.check}Direct bestellen</span>`
-          : `<span class="badge">${I.ext}Via ${esc(r.platform)}</span>`}
-      </span>
-      ${I.next}
-    </button>`).join("");
+      <div class="cover" style="background:${tint(r.color)}" aria-hidden="true">${kindEmoji(r.kind)}
+        ${r.method === "direct" ? `<span class="tag direct">${I.check}Bestel direct</span>` : `<span class="tag">${I.ext}Via ${esc(r.platform)}</span>`}
+      </div>
+      <div class="rest-row"><span class="rest-name">${esc(r.name)}</span><span class="time num">${esc(r.time)}</span></div>
+      <div class="rest-sub">${esc(r.kind)}</div>
+    </button>`).join("") : `<div class="empty">Geen restaurants gevonden. Probeer een andere zoekterm of categorie.</div>`;
 }
 $("#rests").addEventListener("click", e => { const b = e.target.closest("button.rest"); if(b) pick(b.dataset.id); });
 
@@ -438,11 +457,10 @@ function renderGuest(){
 
 function renderMenu(r){
   $("#g-menu").innerHTML = `
-    <button class="back" id="back">${I.back}<span>Alle restaurants</span></button>
-    <div class="mhead">
-      <span class="logo lg" style="background:${esc(r.color)}" aria-hidden="true">${esc(r.name[0])}</span>
-      <div><h2>${esc(r.name)}</h2><div class="meta"><span>${esc(r.kind)}</span><span>${I.clock}${esc(r.time)}</span></div></div>
-    </div>
+    <div class="banner" style="background:${tint(r.color, 24, 50)}" aria-hidden="true">${kindEmoji(r.kind)}
+      <button class="round" id="back" aria-label="Terug naar restaurants">${I.back}</button></div>
+    <h1 class="store">${esc(r.name)}</h1>
+    <div class="meta"><span>${esc(r.kind)}</span><span>${esc(r.time)}</span><span>Gratis bezorging op je kamer</span></div>
     <div class="deliv"><span>Bezorging naar kamer <b>${esc(room())}</b></span><button class="textbtn" id="chg">Wijzig</button></div>
     <ul class="items" id="items"></ul>`;
   renderItems(r);
@@ -450,9 +468,13 @@ function renderMenu(r){
 function renderItems(r){
   $("#items").innerHTML = r.menu.map((m, i) => {
     const q = state.cart[i] || 0, n = esc(m[0]);
-    return `<li class="item"><div><span class="item-name">${n}</span><span class="item-price">${eur(m[1])}</span></div>` +
-      (q ? `<div class="step"><button data-i="${i}" data-d="-1" aria-label="Minder ${n}">${I.minus}</button><output>${q}</output><button data-i="${i}" data-d="1" aria-label="Meer ${n}">${I.plus}</button></div>`
-         : `<button class="add" data-i="${i}" data-d="1" aria-label="Voeg ${n} toe">${I.plus}<span>Toevoegen</span></button>`) + `</li>`;
+    return `<li class="item">
+      <div><span class="item-name">${n}</span><span class="item-price">${eur(m[1])}</span>${q ? `<span class="item-count">${q} in mand</span>` : ""}</div>
+      <div class="thumb" style="background:${tint(r.color, 14, 30)}" aria-hidden="true">${itemEmoji(m[0], r.kind)}
+        <div class="ctl">${q
+          ? `<button data-i="${i}" data-d="-1" aria-label="Minder ${n}">${I.minus}</button><output>${q}</output><button data-i="${i}" data-d="1" aria-label="Meer ${n}">${I.plus}</button>`
+          : `<button data-i="${i}" data-d="1" aria-label="Voeg ${n} toe">${I.plus}</button>`}</div>
+      </div></li>`;
   }).join("");
 }
 $("#g-menu").addEventListener("click", e => {
@@ -472,10 +494,25 @@ function cartTotals(){
 function updateCart(){
   const c = cartTotals();
   $("#cart").classList.toggle("hidden", !(c.n > 0 && state.view === "guest" && state.open && !state.done));
-  $("#cart-n").textContent = c.n + (c.n === 1 ? " item" : " items");
+  $("#cart-c").textContent = c.n;
   $("#cart-t").textContent = eur(c.t);
-  $("#place-room").textContent = room();
+  if(c.n === 0 && $("#csheet").classList.contains("open")) $("#csheet").classList.remove("open");
 }
+function openCart(){
+  const r = find(state.open), c = cartTotals();
+  $("#c-close").innerHTML = I.x;
+  $("#c-body").innerHTML = `
+    <p class="muted">${esc(r.name)}</p>
+    <ul class="lines">${c.items.map(i => `<li><span>${i.q}×</span><span>${esc(i.name)}</span><span class="num">${eur(i.q * i.p)}</span></li>`).join("")}</ul>
+    <div class="total"><span>Totaal</span><span class="num">${eur(c.t)}</span></div>
+    <div class="info">Bezorging naar ${esc(HOTEL)}, kamer ${esc(room())}. Je betaalt bij ontvangst.</div>`;
+  $("#place").textContent = "Bestel voor " + eur(c.t);
+  $("#csheet").classList.add("open");
+}
+$("#open-cart").addEventListener("click", openCart);
+$("#c-close").addEventListener("click", () => $("#csheet").classList.remove("open"));
+$("#csheet").addEventListener("click", e => { if(e.target.id === "csheet") $("#csheet").classList.remove("open"); });
+
 $("#place").addEventListener("click", async () => {
   const r = find(state.open), c = cartTotals();
   if(!room()){ toast("Vul eerst je kamernummer in"); return; }
@@ -485,6 +522,7 @@ $("#place").addEventListener("click", async () => {
       body:JSON.stringify({restaurant_id:r.id, room:room(), items:c.items, total:c.t, commission:Math.round(c.t * r.rate * 100) / 100})});
   }catch(e){ console.error(e); toast("Bestellen mislukt, probeer opnieuw"); btn.disabled = false; return; }
   btn.disabled = false;
+  $("#csheet").classList.remove("open");
   state.done = {rest:r.name, items:c.items, total:c.t, room:room()};
   state.open = null; state.cart = {};
   renderGuest(); window.scrollTo(0, 0);
@@ -500,7 +538,7 @@ function renderDone(){
     <button class="btn block" id="again">Terug naar restaurants</button></div>`;
 }
 $("#g-done").addEventListener("click", e => { if(e.target.closest("#again")){ state.done = null; renderGuest(); } });
-$("#room").addEventListener("input", e => { e.target.value = e.target.value.replace(/[^0-9A-Za-z-]/g, ""); updateCart(); });
+$("#room").addEventListener("input", e => { e.target.value = e.target.value.replace(/[^0-9A-Za-z-]/g, ""); });
 
 /* ---------- Restaurant-dashboard ---------- */
 const FLOW = ["Nieuw","Geaccepteerd","Onderweg","Bezorgd"];
