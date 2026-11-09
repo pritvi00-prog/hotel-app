@@ -85,6 +85,9 @@ svg{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-width:
 .rest-name{font-weight:700;font-size:1.05rem}
 .time{background:var(--gray);border-radius:999px;padding:3px 10px;font-size:.82rem;font-weight:600;white-space:nowrap}
 .rest-sub{color:var(--muted);font-size:.9rem;margin-top:2px}
+.rest.closed .cover{filter:grayscale(1);opacity:.5}
+.rest.closed .rest-name,.rest.closed .time{color:var(--muted)}
+.tag.closed{background:var(--btn);color:var(--btn-ink)}
 .skel{height:230px;border-radius:12px;background:linear-gradient(90deg,var(--gray),var(--line),var(--gray));background-size:200% 100%}
 @media (prefers-reduced-motion:no-preference){.skel{animation:sh 1.3s linear infinite}@keyframes sh{to{background-position:-200% 0}}}
 .empty{border:1.5px dashed var(--line);border-radius:12px;padding:36px 20px;text-align:center;color:var(--muted);grid-column:1/-1}
@@ -240,6 +243,12 @@ tr:last-child td{border-bottom:0}
     <div class="orders" id="orders"></div>
   </section>
 
+  <!-- RECEPTIE -->
+  <section id="v-recep" class="hidden">
+    <div class="sec-head" style="margin-top:8px"><h2>Bezorgingen</h2><span class="muted">Ververst automatisch</span></div>
+    <div class="orders" id="recep-orders"></div>
+  </section>
+
   <!-- HOTEL -->
   <section id="v-hotel" class="hidden">
     <div class="sec-head" style="margin-top:8px"><h2>Overzicht hotel</h2><span class="muted" id="hotel-sync"></span></div>
@@ -362,7 +371,7 @@ async function loadData(){
     RESTAURANTS = rs.map(r => {
       const f = FALLBACK.find(x => x.id === r.id) || {};
       return {id:r.id, name:r.name, kind:r.kind, time:f.time || "30–40 min", color:f.color || "#3d4a5c",
-        method:r.method, platform:r.platform, url:r.url, rate:Number(r.rate),
+        method:r.method, platform:r.platform, url:r.url, rate:Number(r.rate), opens:r.opens, closes:r.closes,
         menu: ms.filter(m => m.restaurant_id === r.id).map(m => [m.name, Number(m.price)])};
     });
   }catch(e){ console.error(e); toast("Database niet bereikbaar, voorbeelddata getoond"); }
@@ -398,16 +407,18 @@ async function login(){
     if(!rows || !rows.length){ state.auth = null; $("#l-err").textContent = "Dit account heeft geen toegang."; return; }
     state.auth.role = rows[0].role; state.auth.restaurant_id = rows[0].restaurant_id;
     $("#l-pw").value = ""; state.seen = null; initAudio();
-    go(state.auth.role === "hotel" ? "hotel" : "rest");
+    go(ROLE_VIEW[state.auth.role] || "login");
   }catch(e){ state.auth = null; $("#l-err").textContent = "Inloggen mislukt. Controleer e-mail en wachtwoord."; }
 }
 function logout(){ state.auth = null; state.orders = []; state.seen = null; document.title = BASE_TITLE; go("guest"); }
 
 /* ---------- Navigatie ---------- */
+const ROLE_VIEW = {restaurant:"rest", hotel:"hotel", reception:"recep"};
+const VIEW_ROLE = {rest:"restaurant", hotel:"hotel", recep:"reception"};
 function go(v){
-  if((v === "rest" || v === "hotel") && !(state.auth && state.auth.role === (v === "rest" ? "restaurant" : "hotel"))) v = "login";
+  if(VIEW_ROLE[v] && !(state.auth && state.auth.role === VIEW_ROLE[v])) v = "login";
   state.view = v;
-  ["guest","login","rest","hotel"].forEach(x => $("#v-" + x).classList.toggle("hidden", x !== v));
+  ["guest","login","rest","hotel","recep"].forEach(x => $("#v-" + x).classList.toggle("hidden", x !== v));
   $("#nav-guest").classList.toggle("hidden", v === "guest");
   $("#nav-dash").classList.toggle("hidden", !(state.auth && v === "guest"));
   $("#nav-staff").classList.toggle("hidden", !(!state.auth && v === "guest"));
@@ -419,9 +430,21 @@ async function refresh(){
   updateCart();
   if(state.view === "rest"){ await loadOrders(); renderRestView(); }
   if(state.view === "hotel"){ await loadOrders(); renderHotel(); }
+  if(state.view === "recep"){ await loadOrders(); renderRecep(); }
 }
 
 /* ---------- Gast ---------- */
+const hm = t => String(t).slice(0, 5);
+const toMin = t => { const [h, m] = String(t).split(":").map(Number); return h * 60 + m; };
+function nowMin(){
+  const p = new Intl.DateTimeFormat("nl-NL", {timeZone:"Europe/Amsterdam", hour:"2-digit", minute:"2-digit", hourCycle:"h23"}).format(new Date());
+  return toMin(p);
+}
+function isOpen(r){
+  if(!r.opens || !r.closes) return true;
+  const n = nowMin(), a = toMin(r.opens), c = toMin(r.closes);
+  return a <= c ? (n >= a && n < c) : (n >= a || n < c);
+}
 const KIND_EMOJI = {Burgers:"🍔", Kip:"🍗", Pizza:"🍕", Snacks:"🍟", Chinees:"🥡"};
 const ITEM_EMOJI = [[/tiramisu/i,"🍰"],[/pizza|margherita|pepperoni|quattro/i,"🍕"],[/friet/i,"🍟"],[/frikandel/i,"🌭"],[/kapsalon/i,"🥙"],[/kroket/i,"🧆"],[/babi|pangang/i,"🍖"],[/nasi/i,"🍛"],[/loempia/i,"🥟"],[/bami/i,"🍜"],[/burger/i,"🍔"],[/kip|chicken/i,"🍗"]];
 const kindEmoji = k => KIND_EMOJI[k] || "🍽️";
@@ -441,19 +464,20 @@ function renderRests(){
   if(!state.loaded){ el.innerHTML = '<div class="skel"></div>'.repeat(3); return; }
   renderCats();
   const list = RESTAURANTS.filter(r => (state.cat === "Alles" || r.kind === state.cat) && (!state.q || (r.name + " " + r.kind).toLowerCase().includes(state.q)));
-  el.innerHTML = list.length ? list.map(r => `
-    <button class="rest" data-id="${esc(r.id)}">
+  el.innerHTML = list.length ? list.map(r => { const open = isOpen(r); return `
+    <button class="rest${open ? "" : " closed"}" data-id="${esc(r.id)}">
       <div class="cover" style="background:${tint(r.color)}" aria-hidden="true">${kindEmoji(r.kind)}
-        ${r.method === "direct" ? `<span class="tag direct">${I.check}Bestel direct</span>` : `<span class="tag">${I.ext}Via ${esc(r.platform)}</span>`}
+        ${!open ? `<span class="tag closed">Gesloten</span>` : r.method === "direct" ? `<span class="tag direct">${I.check}Bestel direct</span>` : `<span class="tag">${I.ext}Via ${esc(r.platform)}</span>`}
       </div>
       <div class="rest-row"><span class="rest-name">${esc(r.name)}</span><span class="time num">${esc(r.time)}</span></div>
-      <div class="rest-sub">${esc(r.kind)}</div>
-    </button>`).join("") : `<div class="empty">Geen restaurants gevonden. Probeer een andere zoekterm of categorie.</div>`;
+      <div class="rest-sub">${open ? esc(r.kind) : "Opent om " + hm(r.opens)}</div>
+    </button>`; }).join("") : `<div class="empty">Geen restaurants gevonden. Probeer een andere zoekterm of categorie.</div>`;
 }
 $("#rests").addEventListener("click", e => { const b = e.target.closest("button.rest"); if(b) pick(b.dataset.id); });
 
 function pick(id){
   const r = find(id);
+  if(!isOpen(r)){ toast(r.name + " is nu gesloten en opent om " + hm(r.opens)); return; }
   if(!room()){ toast("Vul eerst je kamernummer in"); $("#room").focus(); return; }
   if(r.method === "refer"){
     state.pending = r;
@@ -617,6 +641,19 @@ $("#orders").addEventListener("click", async e => {
   renderRestView();
 });
 
+/* ---------- Receptie ---------- */
+function renderRecep(){
+  const list = state.orders.filter(o => o.status !== "Bezorgd").reverse();
+  $("#recep-orders").innerHTML = list.length ? list.map(o => {
+    const step = FLOW.indexOf(o.status), n = o.items.reduce((a, i) => a + i.q, 0);
+    return `<article class="order">
+      <header><div><h3>Kamer ${esc(o.room)}</h3><span class="muted">${esc(o.rest)}</span></div><span class="pill s-${esc(o.status)}">${esc(o.status)}</span></header>
+      <div class="muted">${n} ${n === 1 ? "item" : "items"}, besteld om ${hhmm(o.t)} (${ago(o.t)})</div>
+      <div class="steps" aria-hidden="true">${FLOW.map((_, k) => `<i class="${k <= step ? "on" : ""}"></i>`).join("")}</div>
+    </article>`;
+  }).join("") : `<div class="empty">Geen lopende bezorgingen.</div>`;
+}
+
 /* ---------- Hotel-overzicht ---------- */
 function renderHotel(){
   const os = state.orders, rev = os.reduce((a, o) => a + o.total, 0), com = os.reduce((a, o) => a + o.com, 0);
@@ -636,12 +673,13 @@ function renderHotel(){
 /* ---------- Start ---------- */
 $("#nav-guest").addEventListener("click", () => go("guest"));
 $("#nav-staff").addEventListener("click", () => go("login"));
-$("#nav-dash").addEventListener("click", () => go(state.auth.role === "hotel" ? "hotel" : "rest"));
+$("#nav-dash").addEventListener("click", () => go(ROLE_VIEW[state.auth.role]));
 $("#logout").addEventListener("click", () => { logout(); toast("Uitgelogd"); });
 $("#l-go").addEventListener("click", login);
 $("#l-pw").addEventListener("keydown", e => { if(e.key === "Enter") login(); });
-setInterval(() => { if(state.auth && (state.view === "rest" || state.view === "hotel") && !document.hidden) refresh(); }, 8000);
+setInterval(() => { if(state.auth && (state.view === "rest" || state.view === "hotel" || state.view === "recep") && !document.hidden) refresh(); }, 8000);
 setInterval(pollStatus, 8000);
+setInterval(() => { if(state.view === "guest" && !state.open && !state.done) renderRests(); }, 60000);
 
 try{
   const k = new URLSearchParams(location.search).get("kamer");
