@@ -6,6 +6,7 @@
 <title>Hotel Maashaven – Bestel uit de buurt</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <style>
 :root{
   --bg:#ffffff; --surface:#ffffff; --ink:#000000; --muted:#545454; --line:#e6e6e6; --gray:#f3f3f3;
@@ -136,6 +137,9 @@ svg{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-width:
 .track .past i,.track .now i{background:var(--good)}
 .track .now{color:var(--ink)}
 @media (prefers-reduced-motion:no-preference){.track .now i{animation:pulse 1.4s ease-in-out infinite}@keyframes pulse{50%{opacity:.35}}}
+.map{position:relative;z-index:0;isolation:isolate;width:100%;height:280px;border-radius:12px;overflow:hidden;border:1px solid var(--line)}
+.pin{width:38px;height:38px;border-radius:50%;background:var(--bg);display:grid;place-items:center;font-size:1.25rem;box-shadow:var(--shadow)}
+.btnrow{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
 .summary{width:100%;text-align:left;border:1px solid var(--line);border-radius:12px;padding:6px 18px}
 .summary li{display:flex;justify-content:space-between;gap:12px;padding:10px 0}
 .summary li+li{border-top:1px solid var(--line)}
@@ -156,7 +160,7 @@ svg{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-width:
 .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
 .steps i{height:5px;border-radius:3px;background:var(--line)}
 .steps i.on{background:var(--good)}
-.order footer{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.order footer{flex-wrap:wrap;display:flex;justify-content:space-between;align-items:center;gap:10px}
 
 /* Hotel */
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
@@ -300,8 +304,10 @@ tr:last-child td{border-bottom:0}
   </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
 const BASE_TITLE = document.title;
+const HOTEL_POS = [51.8975, 4.4840]; // pas aan naar de echte locatie van het hotel (breedtegraad, lengtegraad)
 const HOTEL = "Hotel Maashaven, Maashaven Zuidzijde 1, Rotterdam";
 const $ = s => document.querySelector(s);
 const eur = n => Number(n).toLocaleString(({nl:"nl-NL",en:"en-GB",de:"de-DE"})[state.lang] || "nl-NL", {style:"currency",currency:"EUR"});
@@ -330,9 +336,9 @@ const FALLBACK = [
 ];
 
 const T = {
-nl:{staff:"Personeel",deliverTo:"Bezorgen naar kamer",search:"Zoek restaurants",feedTitle:"Bezorging op je kamer",viewCart:"Bekijk winkelmand",cart:"Winkelmand",close:"Sluiten",copyHint:"Kopieer het adres en plak het bij het afrekenen.",goOrder:"Ga naar bestellen",copyAddr:"Kopieer adres",cancel:"Annuleren",all:"Alles",closed:"Gesloten",orderDirect:"Bestel direct",via:"Via {p}",opensAt:"Opent om {t}",noResults:"Geen restaurants gevonden. Probeer een andere zoekterm of categorie.",needRoom:"Vul eerst je kamernummer in",closedToast:"{n} is nu gesloten en opent om {t}",continueTo:"Verder naar {p}",orderingVia:"Je bestelt bij {r} via {p}. Bezorgadres:",room:"kamer",copied:"Adres gekopieerd",copyFail:"Kopiëren lukt niet, selecteer het adres zelf",backToRests:"Terug naar restaurants",freeDelivery:"Gratis bezorging op je kamer",deliveryTo:"Bezorging naar kamer {r}",change:"Wijzig",inCart:"{q} in mand",less:"Minder {n}",more:"Meer {n}",addItem:"Voeg {n} toe",total:"Totaal",deliveryInfo:"Bezorging naar {h}, kamer {r}. Je betaalt bij ontvangst.",orderFor:"Bestel voor {a}",orderFail:"Bestellen mislukt, probeer opnieuw",dbFail:"Database niet bereikbaar, voorbeelddata getoond",payOnReceipt:"Je betaalt bij ontvangst.",stNieuw:"Bestelling ontvangen",stGeaccepteerd:"Het restaurant maakt je bestelling klaar",stOnderweg:"Je bestelling is onderweg",stBezorgd:"Bezorgd, eet smakelijk!",trk0:"Ontvangen",trk1:"Wordt bereid",trk2:"Onderweg",trk3:"Bezorgd",progress:"Voortgang",orderMore:"Nog iets bestellen"},
-en:{staff:"Staff",deliverTo:"Deliver to room",search:"Search restaurants",feedTitle:"Delivered to your room",viewCart:"View basket",cart:"Basket",close:"Close",copyHint:"Copy the address and paste it at checkout.",goOrder:"Continue to order",copyAddr:"Copy address",cancel:"Cancel",all:"All",closed:"Closed",orderDirect:"Order direct",via:"Via {p}",opensAt:"Opens at {t}",noResults:"No restaurants found. Try another search or category.",needRoom:"Enter your room number first",closedToast:"{n} is closed right now and opens at {t}",continueTo:"Continue to {p}",orderingVia:"You’re ordering from {r} via {p}. Delivery address:",room:"room",copied:"Address copied",copyFail:"Copy failed, select the address manually",backToRests:"Back to restaurants",freeDelivery:"Free delivery to your room",deliveryTo:"Delivery to room {r}",change:"Change",inCart:"{q} in basket",less:"Remove one {n}",more:"Add one more {n}",addItem:"Add {n}",total:"Total",deliveryInfo:"Delivery to {h}, room {r}. You pay on receipt.",orderFor:"Order for {a}",orderFail:"Order failed, please try again",dbFail:"Database unreachable, showing sample data",payOnReceipt:"You pay on receipt.",stNieuw:"Order received",stGeaccepteerd:"The restaurant is preparing your order",stOnderweg:"Your order is on its way",stBezorgd:"Delivered, enjoy your meal!",trk0:"Received",trk1:"Preparing",trk2:"On its way",trk3:"Delivered",progress:"Progress",orderMore:"Order something else"},
-de:{staff:"Personal",deliverTo:"Lieferung an Zimmer",search:"Restaurants suchen",feedTitle:"Lieferung auf dein Zimmer",viewCart:"Warenkorb ansehen",cart:"Warenkorb",close:"Schließen",copyHint:"Kopiere die Adresse und füge sie beim Bezahlen ein.",goOrder:"Weiter zur Bestellung",copyAddr:"Adresse kopieren",cancel:"Abbrechen",all:"Alle",closed:"Geschlossen",orderDirect:"Direkt bestellen",via:"Über {p}",opensAt:"Öffnet um {t}",noResults:"Keine Restaurants gefunden. Versuche eine andere Suche oder Kategorie.",needRoom:"Gib zuerst deine Zimmernummer ein",closedToast:"{n} ist gerade geschlossen und öffnet um {t}",continueTo:"Weiter zu {p}",orderingVia:"Du bestellst bei {r} über {p}. Lieferadresse:",room:"Zimmer",copied:"Adresse kopiert",copyFail:"Kopieren fehlgeschlagen, markiere die Adresse selbst",backToRests:"Zurück zu den Restaurants",freeDelivery:"Kostenlose Lieferung auf dein Zimmer",deliveryTo:"Lieferung an Zimmer {r}",change:"Ändern",inCart:"{q} im Warenkorb",less:"Weniger {n}",more:"Mehr {n}",addItem:"{n} hinzufügen",total:"Gesamt",deliveryInfo:"Lieferung an {h}, Zimmer {r}. Du zahlst bei Erhalt.",orderFor:"Bestellen für {a}",orderFail:"Bestellung fehlgeschlagen, bitte erneut versuchen",dbFail:"Datenbank nicht erreichbar, Beispieldaten werden gezeigt",payOnReceipt:"Du zahlst bei Erhalt.",stNieuw:"Bestellung erhalten",stGeaccepteerd:"Das Restaurant bereitet deine Bestellung zu",stOnderweg:"Deine Bestellung ist unterwegs",stBezorgd:"Geliefert, guten Appetit!",trk0:"Erhalten",trk1:"Wird zubereitet",trk2:"Unterwegs",trk3:"Geliefert",progress:"Fortschritt",orderMore:"Noch etwas bestellen"}
+nl:{staff:"Personeel",deliverTo:"Bezorgen naar kamer",search:"Zoek restaurants",feedTitle:"Bezorging op je kamer",viewCart:"Bekijk winkelmand",cart:"Winkelmand",close:"Sluiten",copyHint:"Kopieer het adres en plak het bij het afrekenen.",goOrder:"Ga naar bestellen",copyAddr:"Kopieer adres",cancel:"Annuleren",all:"Alles",closed:"Gesloten",orderDirect:"Bestel direct",via:"Via {p}",opensAt:"Opent om {t}",noResults:"Geen restaurants gevonden. Probeer een andere zoekterm of categorie.",needRoom:"Vul eerst je kamernummer in",closedToast:"{n} is nu gesloten en opent om {t}",continueTo:"Verder naar {p}",orderingVia:"Je bestelt bij {r} via {p}. Bezorgadres:",room:"kamer",copied:"Adres gekopieerd",copyFail:"Kopiëren lukt niet, selecteer het adres zelf",backToRests:"Terug naar restaurants",freeDelivery:"Gratis bezorging op je kamer",deliveryTo:"Bezorging naar kamer {r}",change:"Wijzig",inCart:"{q} in mand",less:"Minder {n}",more:"Meer {n}",addItem:"Voeg {n} toe",total:"Totaal",deliveryInfo:"Bezorging naar {h}, kamer {r}. Je betaalt bij ontvangst.",orderFor:"Bestel voor {a}",orderFail:"Bestellen mislukt, probeer opnieuw",dbFail:"Database niet bereikbaar, voorbeelddata getoond",payOnReceipt:"Je betaalt bij ontvangst.",stNieuw:"Bestelling ontvangen",stGeaccepteerd:"Het restaurant maakt je bestelling klaar",stOnderweg:"Je bestelling is onderweg",stBezorgd:"Bezorgd, eet smakelijk!",trk0:"Ontvangen",trk1:"Wordt bereid",trk2:"Onderweg",trk3:"Bezorgd",progress:"Voortgang",orderMore:"Nog iets bestellen",trackSoon:"Zodra de bezorger onderweg is, kun je hem hier live volgen.",trackWait:"Wachten op de locatie van de bezorger…",trackDist:"De bezorger is ongeveer {d} van het hotel",trackStale:"Laatst bijgewerkt om {t}",mapAria:"Kaart met de locatie van de bezorger"},
+en:{staff:"Staff",deliverTo:"Deliver to room",search:"Search restaurants",feedTitle:"Delivered to your room",viewCart:"View basket",cart:"Basket",close:"Close",copyHint:"Copy the address and paste it at checkout.",goOrder:"Continue to order",copyAddr:"Copy address",cancel:"Cancel",all:"All",closed:"Closed",orderDirect:"Order direct",via:"Via {p}",opensAt:"Opens at {t}",noResults:"No restaurants found. Try another search or category.",needRoom:"Enter your room number first",closedToast:"{n} is closed right now and opens at {t}",continueTo:"Continue to {p}",orderingVia:"You’re ordering from {r} via {p}. Delivery address:",room:"room",copied:"Address copied",copyFail:"Copy failed, select the address manually",backToRests:"Back to restaurants",freeDelivery:"Free delivery to your room",deliveryTo:"Delivery to room {r}",change:"Change",inCart:"{q} in basket",less:"Remove one {n}",more:"Add one more {n}",addItem:"Add {n}",total:"Total",deliveryInfo:"Delivery to {h}, room {r}. You pay on receipt.",orderFor:"Order for {a}",orderFail:"Order failed, please try again",dbFail:"Database unreachable, showing sample data",payOnReceipt:"You pay on receipt.",stNieuw:"Order received",stGeaccepteerd:"The restaurant is preparing your order",stOnderweg:"Your order is on its way",stBezorgd:"Delivered, enjoy your meal!",trk0:"Received",trk1:"Preparing",trk2:"On its way",trk3:"Delivered",progress:"Progress",orderMore:"Order something else",trackSoon:"Once the courier is on the way, you can follow them live here.",trackWait:"Waiting for the courier’s location…",trackDist:"The courier is about {d} from the hotel",trackStale:"Last updated at {t}",mapAria:"Map showing the courier’s location"},
+de:{staff:"Personal",deliverTo:"Lieferung an Zimmer",search:"Restaurants suchen",feedTitle:"Lieferung auf dein Zimmer",viewCart:"Warenkorb ansehen",cart:"Warenkorb",close:"Schließen",copyHint:"Kopiere die Adresse und füge sie beim Bezahlen ein.",goOrder:"Weiter zur Bestellung",copyAddr:"Adresse kopieren",cancel:"Abbrechen",all:"Alle",closed:"Geschlossen",orderDirect:"Direkt bestellen",via:"Über {p}",opensAt:"Öffnet um {t}",noResults:"Keine Restaurants gefunden. Versuche eine andere Suche oder Kategorie.",needRoom:"Gib zuerst deine Zimmernummer ein",closedToast:"{n} ist gerade geschlossen und öffnet um {t}",continueTo:"Weiter zu {p}",orderingVia:"Du bestellst bei {r} über {p}. Lieferadresse:",room:"Zimmer",copied:"Adresse kopiert",copyFail:"Kopieren fehlgeschlagen, markiere die Adresse selbst",backToRests:"Zurück zu den Restaurants",freeDelivery:"Kostenlose Lieferung auf dein Zimmer",deliveryTo:"Lieferung an Zimmer {r}",change:"Ändern",inCart:"{q} im Warenkorb",less:"Weniger {n}",more:"Mehr {n}",addItem:"{n} hinzufügen",total:"Gesamt",deliveryInfo:"Lieferung an {h}, Zimmer {r}. Du zahlst bei Erhalt.",orderFor:"Bestellen für {a}",orderFail:"Bestellung fehlgeschlagen, bitte erneut versuchen",dbFail:"Datenbank nicht erreichbar, Beispieldaten werden gezeigt",payOnReceipt:"Du zahlst bei Erhalt.",stNieuw:"Bestellung erhalten",stGeaccepteerd:"Das Restaurant bereitet deine Bestellung zu",stOnderweg:"Deine Bestellung ist unterwegs",stBezorgd:"Geliefert, guten Appetit!",trk0:"Erhalten",trk1:"Wird zubereitet",trk2:"Unterwegs",trk3:"Geliefert",progress:"Fortschritt",orderMore:"Noch etwas bestellen",trackSoon:"Sobald der Fahrer unterwegs ist, kannst du ihn hier live verfolgen.",trackWait:"Warte auf den Standort des Fahrers…",trackDist:"Der Fahrer ist etwa {d} vom Hotel entfernt",trackStale:"Zuletzt aktualisiert um {t}",mapAria:"Karte mit dem Standort des Fahrers"}
 };
 const KIND_TR = {Kip:{en:"Chicken", de:"Hähnchen"}, Chinees:{en:"Chinese", de:"Chinesisch"}};
 const LANGS = ["nl","en","de"];
@@ -385,6 +391,38 @@ const STORE = "hotelOrder";
 const saveOrder = o => { try{ localStorage.setItem(STORE, JSON.stringify(o)); }catch(e){} };
 const clearOrder = () => { try{ localStorage.removeItem(STORE); }catch(e){} };
 
+/* ---------- Kaart (Leaflet + OpenStreetMap) ---------- */
+let map = null, mCourier = null;
+function destroyMap(){ if(map){ try{ map.remove(); }catch(e){} } map = null; mCourier = null; }
+const pinIcon = e => L.divIcon({className:"pin", html:e, iconSize:[38, 38], iconAnchor:[19, 19]});
+function ensureMap(){
+  const el = $("#track-map"); if(!el || !window.L) return;
+  destroyMap();
+  map = L.map(el).setView(HOTEL_POS, 15);
+  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom:19, attribution:"© OpenStreetMap"}).addTo(map);
+  L.marker(HOTEL_POS, {icon:pinIcon("🏨")}).addTo(map);
+  updateMap(true);
+}
+function distM(a, b){
+  const R = 6371000, rad = x => x * Math.PI / 180, dLat = rad(b[0] - a[0]), dLng = rad(b[1] - a[1]);
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(rad(a[0])) * Math.cos(rad(b[0])) * Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(h));
+}
+function updateMap(first){
+  const d = state.done, note = $("#track-note"); if(!d) return;
+  const p = d.pos;
+  if(!p){ if(note) note.textContent = t("trackWait"); return; }
+  const ll = [p.lat, p.lng], m = distM(ll, HOTEL_POS);
+  const dist = m < 1000 ? Math.max(10, Math.round(m / 10) * 10) + " m" : (m / 1000).toFixed(1) + " km";
+  const stale = p.at && Date.now() - new Date(p.at) > 120000;
+  if(note) note.textContent = t("trackDist", {d:dist}) + (stale ? ". " + t("trackStale", {t:hhmm(new Date(p.at))}) : "");
+  if(!map || !window.L) return;
+  if(!mCourier) mCourier = L.marker(ll, {icon:pinIcon("🛵")}).addTo(map); else mCourier.setLatLng(ll);
+  if(first || !mCourier._fitted || !map.getBounds().contains(ll)){
+    map.fitBounds(L.latLngBounds([HOTEL_POS, ll]).pad(0.3), {maxZoom:17}); mCourier._fitted = true;
+  }
+}
+
 /* ---------- Supabase ---------- */
 const SB_URL = "https://veggbrabijaqdlomwtkg.supabase.co";
 const SB_KEY = "sb_publishable_pkk9dkAiGWNXAJ8TfrVvvw_JpLzagL0";
@@ -407,7 +445,7 @@ async function loadData(){
     RESTAURANTS = rs.map(r => {
       const f = FALLBACK.find(x => x.id === r.id) || {};
       return {id:r.id, name:r.name, kind:r.kind, time:f.time || "30–40 min", color:f.color || "#3d4a5c",
-        method:r.method, platform:r.platform, url:r.url, rate:Number(r.rate), opens:r.opens, closes:r.closes,
+        method:r.method, platform:r.platform, url:r.url, rate:Number(r.rate), opens:r.opens, closes:r.closes, tracking:!!r.tracking,
         menu: ms.filter(m => m.restaurant_id === r.id).map(m => [m.name, Number(m.price)])};
     });
   }catch(e){ console.error(e); toast(t("dbFail")); }
@@ -446,7 +484,7 @@ async function login(){
     go(ROLE_VIEW[state.auth.role] || "login");
   }catch(e){ state.auth = null; $("#l-err").textContent = "Inloggen mislukt. Controleer e-mail en wachtwoord."; }
 }
-function logout(){ state.auth = null; state.orders = []; state.seen = null; document.title = BASE_TITLE; go("guest"); }
+function logout(){ stopShare(); state.auth = null; state.orders = []; state.seen = null; document.title = BASE_TITLE; go("guest"); }
 
 /* ---------- Navigatie ---------- */
 const ROLE_VIEW = {restaurant:"rest", hotel:"hotel", reception:"recep"};
@@ -616,7 +654,7 @@ $("#place").addEventListener("click", async () => {
   }catch(e){ console.error(e); toast(t("orderFail")); btn.disabled = false; return; }
   btn.disabled = false;
   $("#csheet").classList.remove("open");
-  state.done = {token, rest:r.name, items:c.items, total:c.t, room:room(), status:"Nieuw", at:Date.now()};
+  state.done = {token, rest:r.name, items:c.items, total:c.t, room:room(), status:"Nieuw", at:Date.now(), track:!!r.tracking, pos:null};
   saveOrder(state.done);
   state.open = null; state.cart = {};
   renderGuest(); window.scrollTo(0, 0);
@@ -624,27 +662,50 @@ $("#place").addEventListener("click", async () => {
 function renderDone(){
   const d = state.done, step = FLOW.indexOf(d.status), fin = d.status === "Bezorgd";
   const labels = [t("trk0"), t("trk1"), t("trk2"), t("trk3")];
+  const mapBlock = d.track && d.status === "Onderweg"
+    ? `<div class="map" id="track-map" role="img" aria-label="${esc(t("mapAria"))}"></div><p class="muted" id="track-note">${t("trackWait")}</p>`
+    : (d.track && !fin ? `<p class="muted">${t("trackSoon")}</p>` : "");
+  destroyMap();
   $("#g-done").innerHTML = `<div class="done">
     <div class="done-icon">${fin ? I.check : I.clock}</div>
     <h2>${esc(T[state.lang]["st" + d.status] || d.status)}</h2>
     <p class="muted">${esc(d.rest)}, ${t("room")} ${esc(d.room)}. ${t("payOnReceipt")}</p>
     <ol class="track" aria-label="${t("progress")}">${labels.map((l, k) => `<li class="${k < step ? "past" : k === step ? "now" : ""}"><i></i><span>${l}</span></li>`).join("")}</ol>
+    ${mapBlock}
     <ul class="summary">${d.items.map(i => `<li><span>${i.q}× ${esc(i.name)}</span><span class="num">${eur(i.q * i.p)}</span></li>`).join("")}
       <li class="tot"><span>${t("total")}</span><span class="num">${eur(d.total)}</span></li></ul>
     <button class="btn block" id="again">${fin ? t("backToRests") : t("orderMore")}</button></div>`;
+  if(d.track && d.status === "Onderweg") ensureMap();
 }
 async function pollStatus(){
   const d = state.done;
   if(!d || !d.token || d.status === "Bezorgd" || state.view !== "guest" || document.hidden) return;
   try{
-    const st = await sb("rpc/order_status", {method:"POST", body:JSON.stringify({p_token:d.token})});
-    if(st && st !== d.status){ d.status = st; saveOrder(d); if(state.done === d) renderDone(); }
+    const r = await sb("rpc/order_track", {method:"POST", body:JSON.stringify({p_token:d.token})});
+    if(!r) return;
+    const track = !!r.track, pos = (r.lat != null && r.lng != null) ? {lat:r.lat, lng:r.lng, at:r.at} : null;
+    const changed = r.status !== d.status || track !== !!d.track;
+    d.status = r.status; d.track = track; d.pos = pos;
+    if(state.done !== d) return;
+    if(changed){ saveOrder(d); renderDone(); updateMap(true); } else updateMap(false);
   }catch(e){ console.error(e); }
 }
 $("#g-done").addEventListener("click", e => { if(e.target.closest("#again")){ if(state.done && state.done.status === "Bezorgd") clearOrder(); state.done = null; renderGuest(); } });
 $("#room").addEventListener("input", e => { e.target.value = e.target.value.replace(/[^0-9A-Za-z-]/g, ""); });
 
 /* ---------- Restaurant-dashboard ---------- */
+let watchId = null, shareOrder = null, lastSent = 0;
+function startShare(id){
+  if(!navigator.geolocation){ toast("Locatie delen wordt niet ondersteund op dit apparaat"); return; }
+  stopShare(); shareOrder = id; lastSent = 0;
+  watchId = navigator.geolocation.watchPosition(pos => {
+    const now = Date.now(); if(now - lastSent < 5000) return; lastSent = now;
+    sb("orders?id=eq." + id, {method:"PATCH", headers:{Prefer:"return=minimal"},
+      body:JSON.stringify({courier_lat:pos.coords.latitude, courier_lng:pos.coords.longitude, courier_at:new Date().toISOString()})}).catch(console.error);
+  }, err => { toast("Locatie niet beschikbaar: " + err.message); stopShare(); renderRestView(); },
+  {enableHighAccuracy:true, maximumAge:3000});
+}
+function stopShare(){ if(watchId != null && navigator.geolocation) navigator.geolocation.clearWatch(watchId); watchId = null; shareOrder = null; }
 const FLOW = ["Nieuw","Geaccepteerd","Onderweg","Bezorgd"];
 const ACTION = {Nieuw:"Bestelling accepteren", Geaccepteerd:"Melden: onderweg", Onderweg:"Melden: bezorgd"};
 function renderRestView(){
@@ -660,20 +721,25 @@ function renderRestView(){
   const list = groups[state.filter];
   $("#orders").innerHTML = list.length ? list.map(o => {
     const step = FLOW.indexOf(o.status);
+    const canShare = o.status === "Onderweg" && r && r.tracking;
+    const share = canShare ? `<button class="btn ghost" data-share="${o.id}">${shareOrder === o.id ? "Stop met delen" : "Live locatie delen"}</button>` : "";
+    const note = shareOrder === o.id ? `<div class="muted">Je locatie wordt live gedeeld met de gast. Houd dit scherm open.</div>` : "";
     return `<article class="order">
       <header><div><h3>Kamer ${esc(o.room)}</h3><span class="muted">${hhmm(o.t)}, ${ago(o.t)}</span></div><span class="pill s-${esc(o.status)}">${esc(o.status)}</span></header>
       <ul class="lines">${o.items.map(i => `<li><span>${i.q}×</span><span>${esc(i.name)}</span><span class="num">${eur(i.q * i.p)}</span></li>`).join("")}</ul>
       <div class="steps" aria-hidden="true">${FLOW.map((_, k) => `<i class="${k <= step ? "on" : ""}"></i>`).join("")}</div>
-      <footer><strong class="num">${eur(o.total)}</strong>${ACTION[o.status] ? `<button class="btn" data-id="${o.id}">${ACTION[o.status]}</button>` : ""}</footer>
+      ${note}<footer><strong class="num">${eur(o.total)}</strong><span class="btnrow">${share}${ACTION[o.status] ? `<button class="btn" data-id="${o.id}">${ACTION[o.status]}</button>` : ""}</span></footer>
     </article>`;
   }).join("") : `<div class="empty">Geen bestellingen in deze lijst. Nieuwe bestellingen verschijnen hier vanzelf.</div>`;
 }
 $("#chips").addEventListener("click", e => { const b = e.target.closest("[data-f]"); if(b){ state.filter = b.dataset.f; renderRestView(); } });
 $("#orders").addEventListener("click", async e => {
+  const sh = e.target.closest("button[data-share]");
+  if(sh){ const id = +sh.dataset.share; if(shareOrder === id) stopShare(); else startShare(id); renderRestView(); return; }
   const b = e.target.closest("button[data-id]"); if(!b) return;
   const o = state.orders.find(x => x.id == b.dataset.id), next = FLOW[FLOW.indexOf(o.status) + 1];
   b.disabled = true;
-  try{ await sb("orders?id=eq." + o.id, {method:"PATCH", body:JSON.stringify({status:next})}); o.status = next; }
+  try{ await sb("orders?id=eq." + o.id, {method:"PATCH", body:JSON.stringify(next === "Bezorgd" ? {status:next, courier_lat:null, courier_lng:null, courier_at:null} : {status:next})}); o.status = next; if(next === "Bezorgd" && shareOrder === o.id) stopShare(); }
   catch(err){ console.error(err); toast("Status bijwerken mislukt"); }
   renderRestView();
 });
@@ -716,7 +782,7 @@ $("#lang").addEventListener("click", e => { const b = e.target.closest("[data-l]
 $("#l-go").addEventListener("click", login);
 $("#l-pw").addEventListener("keydown", e => { if(e.key === "Enter") login(); });
 setInterval(() => { if(state.auth && (state.view === "rest" || state.view === "hotel" || state.view === "recep") && !document.hidden) refresh(); }, 8000);
-setInterval(pollStatus, 8000);
+setInterval(pollStatus, 5000);
 setInterval(() => { if(state.view === "guest" && !state.open && !state.done) renderRests(); }, 60000);
 
 try{
