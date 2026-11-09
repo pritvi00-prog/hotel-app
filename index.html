@@ -133,7 +133,7 @@ th{color:var(--muted);font-weight:600}
       </div>
       <div class="room-field">
         <label for="room">Kamernummer</label>
-        <input id="room" inputmode="numeric" maxlength="4" placeholder="304" value="304">
+        <input id="room" inputmode="numeric" maxlength="4" placeholder="304">
       </div>
     </div>
 
@@ -421,6 +421,10 @@ async function render(){
 $("#l-go").addEventListener("click", login);
 $("#l-pw").addEventListener("keydown", e => { if(e.key === "Enter") login(); });
 $("#logout").addEventListener("click", () => { logout(); toast("Uitgelogd"); });
+try{
+  const k = new URLSearchParams(location.search).get("kamer");
+  if(k) $("#room").value = k.replace(/[^0-9A-Za-z-]/g,"").slice(0,4);
+}catch(e){}
 renderRests();
 loadData();
 </script>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QR-codes per kamer</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+body{font-family:system-ui,sans-serif;margin:0;padding:24px;color:#10242b}
+.ctl{display:grid;gap:10px;max-width:420px;margin-bottom:24px}
+.ctl input{font:inherit;padding:10px;border:1px solid #bbb;border-radius:8px}
+.ctl button{font:inherit;padding:10px;border:0;border-radius:8px;background:#2a3bd6;color:#fff;font-weight:600;cursor:pointer}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:16px}
+.card{border:2px dashed #888;border-radius:14px;padding:16px;text-align:center;break-inside:avoid}
+.card h3{margin:0 0 4px;font-size:1.1rem}
+.card p{margin:4px 0 10px;font-size:.9rem}
+.qr{display:flex;justify-content:center}
+@media print{.ctl{display:none}body{padding:0}}
+</style>
+</head>
+<body>
+<div class="ctl">
+  <h2 style="margin:0">QR-codes per kamer</h2>
+  <label>Link van je app<input id="base" value="https://hotel-app.vercel.app/"></label>
+  <label>Hotelnaam<input id="hotel" value="Hotel Maashaven"></label>
+  <label>Kamers (bijv. 101-110, 201-210)<input id="rooms" value="101-105"></label>
+  <button id="go">Maak QR-codes</button>
+  <small>Daarna printen via Cmd+P. Alleen de kaarten worden geprint.</small>
+</div>
+<div class="grid" id="grid"></div>
+<script>
+function parse(t){
+  const out=[];
+  t.split(",").forEach(p=>{
+    p=p.trim(); if(!p) return;
+    const m=p.match(/^(\d+)-(\d+)$/);
+    if(m){ for(let i=+m[1];i<=+m[2]&&out.length<500;i++) out.push(String(i)); }
+    else out.push(p);
+  });
+  return out;
+}
+document.getElementById("go").addEventListener("click",()=>{
+  const base=document.getElementById("base").value.trim().replace(/\?.*$/,"");
+  const hotel=document.getElementById("hotel").value.trim();
+  const grid=document.getElementById("grid"); grid.innerHTML="";
+  parse(document.getElementById("rooms").value).forEach(r=>{
+    const c=document.createElement("div"); c.className="card";
+    c.innerHTML="<h3></h3><p>Scan en bestel eten op je kamer</p><div class='qr'></div>";
+    c.querySelector("h3").textContent=hotel+" · kamer "+r;
+    grid.appendChild(c);
+    new QRCode(c.querySelector(".qr"),{text:base+"?kamer="+encodeURIComponent(r),width:160,height:160});
+  });
+});
+</script>
+</body>
+</html>
