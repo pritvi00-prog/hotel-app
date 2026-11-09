@@ -122,6 +122,12 @@ svg{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-width:
 .done-icon{width:76px;height:76px;border-radius:50%;background:var(--good);color:#fff;display:grid;place-items:center}
 .done-icon svg{width:38px;height:38px;stroke-width:3}
 .done h2{font-size:2rem;font-weight:800}
+.track{width:100%;display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:4px 0;padding:0;list-style:none}
+.track li{display:grid;gap:8px;justify-items:start;font-size:.85rem;font-weight:600;color:var(--muted);text-align:left}
+.track i{display:block;height:6px;width:100%;border-radius:3px;background:var(--line)}
+.track .past i,.track .now i{background:var(--good)}
+.track .now{color:var(--ink)}
+@media (prefers-reduced-motion:no-preference){.track .now i{animation:pulse 1.4s ease-in-out infinite}@keyframes pulse{50%{opacity:.35}}}
 .summary{width:100%;text-align:left;border:1px solid var(--line);border-radius:12px;padding:6px 18px}
 .summary li{display:flex;justify-content:space-between;gap:12px;padding:10px 0}
 .summary li+li{border-top:1px solid var(--line)}
@@ -179,7 +185,7 @@ tr:last-child td{border-bottom:0}
 .row{display:flex;gap:10px;flex-wrap:wrap}
 @media (min-width:700px){.modal{align-items:center;padding:14px}.sheet{border-radius:20px}}
 
-.toast{position:fixed;left:50%;top:76px;transform:translateX(-50%);background:var(--btn);color:var(--btn-ink);padding:11px 20px;border-radius:999px;font-weight:600;display:none;z-index:40;box-shadow:var(--shadow);max-width:92vw}
+.toast{position:fixed;width:max-content;left:50%;top:76px;transform:translateX(-50%);background:var(--btn);color:var(--btn-ink);padding:11px 20px;border-radius:999px;font-weight:600;display:none;z-index:40;box-shadow:var(--shadow);max-width:92vw}
 .toast.show{display:block}
 </style>
 </head>
@@ -280,6 +286,7 @@ tr:last-child td{border-bottom:0}
 </div>
 
 <script>
+const BASE_TITLE = document.title;
 const HOTEL = "Hotel Maashaven, Maashaven Zuidzijde 1, Rotterdam";
 const $ = s => document.querySelector(s);
 const eur = n => Number(n).toLocaleString("nl-NL",{style:"currency",currency:"EUR"});
@@ -307,12 +314,31 @@ const FALLBACK = [
   {id:"wok", name:"Wok Palace", kind:"Chinees", time:"30–45 min", color:"#6a2a8a", method:"direct", rate:0.12, menu:[["Babi pangang",11.9],["Nasi goreng",10.5],["Loempia’s (4x)",5.5],["Bami goreng",10.5]]}
 ];
 
-const state = {view:"guest", open:null, cart:{}, orders:[], pending:null, filter:"Actief", done:null, loaded:false, auth:null, cat:"Alles", q:"", cartOpen:false};
+const state = {view:"guest", open:null, cart:{}, orders:[], pending:null, filter:"Actief", done:null, loaded:false, auth:null, cat:"Alles", q:"", cartOpen:false, seen:null};
 let RESTAURANTS = FALLBACK;
 const find = id => RESTAURANTS.find(r => r.id === id);
 const room = () => ($("#room").value || "").trim();
 
 function toast(t){ const el = $("#toast"); el.textContent = t; el.classList.add("show"); clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove("show"), 2600); }
+
+let actx = null;
+function initAudio(){ try{ actx = actx || new (window.AudioContext || window.webkitAudioContext)(); if(actx.state === "suspended") actx.resume(); }catch(e){} }
+function beep(){
+  if(!actx) return;
+  [880, 1175, 880].forEach((f, i) => {
+    const o = actx.createOscillator(), g = actx.createGain(), t = actx.currentTime + i * 0.2;
+    o.frequency.value = f; o.connect(g); g.connect(actx.destination);
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.3, t + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.17);
+    o.start(t); o.stop(t + 0.2);
+  });
+}
+document.addEventListener("click", initAudio, {once:true});
+const uuid = () => (window.crypto && crypto.randomUUID) ? crypto.randomUUID()
+  : "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, c => { const r = Math.random() * 16 | 0; return (c === "x" ? r : (r & 3 | 8)).toString(16); });
+const STATUS_TXT = {Nieuw:"Bestelling ontvangen", Geaccepteerd:"Het restaurant maakt je bestelling klaar", Onderweg:"Je bestelling is onderweg", Bezorgd:"Bezorgd, eet smakelijk!"};
+const STORE = "hotelOrder";
+const saveOrder = o => { try{ localStorage.setItem(STORE, JSON.stringify(o)); }catch(e){} };
+const clearOrder = () => { try{ localStorage.removeItem(STORE); }catch(e){} };
 
 /* ---------- Supabase ---------- */
 const SB_URL = "https://veggbrabijaqdlomwtkg.supabase.co";
@@ -350,6 +376,11 @@ async function loadOrders(){
     state.orders = rows.map(o => ({id:o.id, t:new Date(o.created_at), room:o.room, restId:o.restaurant_id,
       rest:(find(o.restaurant_id) || {}).name || o.restaurant_id,
       items:o.items, total:Number(o.total), com:Number(o.commission), status:o.status}));
+    if(state.auth && state.auth.role === "restaurant"){
+      const fresh = state.orders.filter(o => o.restId === state.auth.restaurant_id && o.status === "Nieuw" && state.seen && !state.seen.has(o.id));
+      if(fresh.length){ beep(); toast("Nieuwe bestelling: kamer " + fresh[0].room); }
+    }
+    state.seen = new Set(state.orders.map(o => o.id));
   }catch(e){ console.error(e); }
 }
 
@@ -366,11 +397,11 @@ async function login(){
     const rows = await sb("staff?select=*");
     if(!rows || !rows.length){ state.auth = null; $("#l-err").textContent = "Dit account heeft geen toegang."; return; }
     state.auth.role = rows[0].role; state.auth.restaurant_id = rows[0].restaurant_id;
-    $("#l-pw").value = "";
+    $("#l-pw").value = ""; state.seen = null; initAudio();
     go(state.auth.role === "hotel" ? "hotel" : "rest");
   }catch(e){ state.auth = null; $("#l-err").textContent = "Inloggen mislukt. Controleer e-mail en wachtwoord."; }
 }
-function logout(){ state.auth = null; state.orders = []; go("guest"); }
+function logout(){ state.auth = null; state.orders = []; state.seen = null; document.title = BASE_TITLE; go("guest"); }
 
 /* ---------- Navigatie ---------- */
 function go(v){
@@ -517,27 +548,39 @@ $("#place").addEventListener("click", async () => {
   const r = find(state.open), c = cartTotals();
   if(!room()){ toast("Vul eerst je kamernummer in"); return; }
   const btn = $("#place"); btn.disabled = true;
+  const token = uuid();
   try{
     await sb("orders", {method:"POST", headers:{Prefer:"return=minimal"},
-      body:JSON.stringify({restaurant_id:r.id, room:room(), items:c.items, total:c.t, commission:Math.round(c.t * r.rate * 100) / 100})});
+      body:JSON.stringify({token, restaurant_id:r.id, room:room(), items:c.items, total:c.t, commission:Math.round(c.t * r.rate * 100) / 100})});
   }catch(e){ console.error(e); toast("Bestellen mislukt, probeer opnieuw"); btn.disabled = false; return; }
   btn.disabled = false;
   $("#csheet").classList.remove("open");
-  state.done = {rest:r.name, items:c.items, total:c.t, room:room()};
+  state.done = {token, rest:r.name, items:c.items, total:c.t, room:room(), status:"Nieuw", at:Date.now()};
+  saveOrder(state.done);
   state.open = null; state.cart = {};
   renderGuest(); window.scrollTo(0, 0);
 });
 function renderDone(){
-  const d = state.done;
+  const d = state.done, step = FLOW.indexOf(d.status), fin = d.status === "Bezorgd";
+  const labels = ["Ontvangen", "Wordt bereid", "Onderweg", "Bezorgd"];
   $("#g-done").innerHTML = `<div class="done">
-    <div class="done-icon">${I.check}</div>
-    <h2>Bestelling geplaatst</h2>
-    <p class="muted">${esc(d.rest)} heeft je bestelling ontvangen en brengt hem naar kamer ${esc(d.room)}. Je betaalt bij ontvangst.</p>
+    <div class="done-icon">${fin ? I.check : I.clock}</div>
+    <h2>${esc(STATUS_TXT[d.status] || d.status)}</h2>
+    <p class="muted">${esc(d.rest)}, kamer ${esc(d.room)}. Je betaalt bij ontvangst.</p>
+    <ol class="track" aria-label="Voortgang">${labels.map((l, k) => `<li class="${k < step ? "past" : k === step ? "now" : ""}"><i></i><span>${l}</span></li>`).join("")}</ol>
     <ul class="summary">${d.items.map(i => `<li><span>${i.q}× ${esc(i.name)}</span><span class="num">${eur(i.q * i.p)}</span></li>`).join("")}
       <li class="tot"><span>Totaal</span><span class="num">${eur(d.total)}</span></li></ul>
-    <button class="btn block" id="again">Terug naar restaurants</button></div>`;
+    <button class="btn block" id="again">${fin ? "Terug naar restaurants" : "Nog iets bestellen"}</button></div>`;
 }
-$("#g-done").addEventListener("click", e => { if(e.target.closest("#again")){ state.done = null; renderGuest(); } });
+async function pollStatus(){
+  const d = state.done;
+  if(!d || !d.token || d.status === "Bezorgd" || state.view !== "guest" || document.hidden) return;
+  try{
+    const st = await sb("rpc/order_status", {method:"POST", body:JSON.stringify({p_token:d.token})});
+    if(st && st !== d.status){ d.status = st; saveOrder(d); if(state.done === d) renderDone(); }
+  }catch(e){ console.error(e); }
+}
+$("#g-done").addEventListener("click", e => { if(e.target.closest("#again")){ if(state.done && state.done.status === "Bezorgd") clearOrder(); state.done = null; renderGuest(); } });
 $("#room").addEventListener("input", e => { e.target.value = e.target.value.replace(/[^0-9A-Za-z-]/g, ""); });
 
 /* ---------- Restaurant-dashboard ---------- */
@@ -551,6 +594,8 @@ function renderRestView(){
   const groups = {Actief:all.filter(o => o.status !== "Bezorgd"), Bezorgd:all.filter(o => o.status === "Bezorgd"), Alle:all};
   $("#chips").innerHTML = ["Actief","Bezorgd","Alle"].map(k =>
     `<button class="chip" data-f="${k}" aria-pressed="${state.filter === k}">${k}<b>${groups[k].length}</b></button>`).join("");
+  const nNew = all.filter(o => o.status === "Nieuw").length;
+  document.title = nNew ? "(" + nNew + ") Nieuwe bestelling – " + BASE_TITLE : BASE_TITLE;
   const list = groups[state.filter];
   $("#orders").innerHTML = list.length ? list.map(o => {
     const step = FLOW.indexOf(o.status);
@@ -595,13 +640,20 @@ $("#nav-dash").addEventListener("click", () => go(state.auth.role === "hotel" ? 
 $("#logout").addEventListener("click", () => { logout(); toast("Uitgelogd"); });
 $("#l-go").addEventListener("click", login);
 $("#l-pw").addEventListener("keydown", e => { if(e.key === "Enter") login(); });
-setInterval(() => { if(state.auth && (state.view === "rest" || state.view === "hotel") && !document.hidden) refresh(); }, 15000);
+setInterval(() => { if(state.auth && (state.view === "rest" || state.view === "hotel") && !document.hidden) refresh(); }, 8000);
+setInterval(pollStatus, 8000);
 
 try{
   const k = new URLSearchParams(location.search).get("kamer");
   if(k) $("#room").value = k.replace(/[^0-9A-Za-z-]/g, "").slice(0, 4);
 }catch(e){}
+try{
+  const saved = JSON.parse(localStorage.getItem(STORE) || "null");
+  if(saved && saved.token && Date.now() - saved.at < 6 * 3600 * 1000){ state.done = saved; }
+  else if(saved) clearOrder();
+}catch(e){}
 go("guest");
+if(state.done){ renderGuest(); pollStatus(); }
 renderRests();
 loadData();
 </script>
