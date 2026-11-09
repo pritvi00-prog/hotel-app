@@ -3,54 +3,230 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>QR-codes per kamer</title>
+<title>QR-codes voor kamers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
-body{font-family:system-ui,sans-serif;margin:0;padding:24px;color:#10242b}
-.ctl{display:grid;gap:10px;max-width:420px;margin-bottom:24px}
-.ctl input{font:inherit;padding:10px;border:1px solid #bbb;border-radius:8px}
-.ctl button{font:inherit;padding:10px;border:0;border-radius:8px;background:#2a3bd6;color:#fff;font-weight:600;cursor:pointer}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:16px}
-.card{border:2px dashed #888;border-radius:14px;padding:16px;text-align:center;break-inside:avoid}
-.card h3{margin:0 0 4px;font-size:1.1rem}
-.card p{margin:4px 0 10px;font-size:.9rem}
-.qr{display:flex;justify-content:center}
-@media print{.ctl{display:none}body{padding:0}}
+:root{
+  --bg:#ffffff; --surface:#ffffff; --ink:#000000; --muted:#545454; --line:#e6e6e6; --gray:#f3f3f3;
+  --btn:#000000; --btn-ink:#ffffff; --link:#276ef1; --warn:#a85a00;
+  --font:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root{--bg:#000000; --surface:#141414; --ink:#ffffff; --muted:#a6a6a6; --line:#2b2b2b; --gray:#1f1f1f;
+    --btn:#ffffff; --btn-ink:#000000; --link:#6ea0ff; --warn:#f0b35a; color-scheme:dark;}
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.45 var(--font);-webkit-font-smoothing:antialiased}
+h1,h2{margin:0;letter-spacing:-.02em;line-height:1.15;font-weight:800}
+p{margin:0}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--link);outline-offset:2px}
+.muted{color:var(--muted)}
+.small{font-size:.9rem}
+.hidden{display:none !important}
+
+.bar{border-bottom:1px solid var(--line)}
+.bar-in{max-width:1120px;margin:0 auto;padding:0 20px;height:64px;display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.15rem;letter-spacing:-.03em}
+.mark{width:32px;height:32px;border-radius:8px;background:var(--btn);color:var(--btn-ink);display:grid;place-items:center}
+
+.layout{max-width:1120px;margin:0 auto;padding:24px 20px 60px;display:grid;gap:28px;align-items:start}
+@media (min-width:900px){.layout{grid-template-columns:360px 1fr}.controls{position:sticky;top:20px}}
+
+.controls{display:grid;gap:16px}
+.controls h1{font-size:1.9rem}
+.field{display:grid;gap:6px;font-weight:600;font-size:.95rem}
+.field input,.field select{background:var(--gray);border:0;border-radius:12px;padding:13px 14px;width:100%;font-weight:400;color:var(--ink);transition:box-shadow .2s}
+.field input:focus,.field select:focus{outline:none;box-shadow:0 0 0 2px var(--ink)}
+.hint{color:var(--muted);font-size:.88rem;font-weight:400}
+.err{color:var(--warn);font-size:.9rem;font-weight:600;min-height:1.2em}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{border:0;background:var(--gray);border-radius:999px;padding:6px 12px;font-size:.85rem;font-weight:600;cursor:pointer;transition:background-color .2s,transform .12s}
+.chip:active{transform:scale(.96)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:999px;padding:14px 22px;font-weight:600;background:var(--btn);color:var(--btn-ink);cursor:pointer;transition:filter .2s,transform .12s;width:100%}
+.btn:hover{filter:brightness(1.25)}
+.btn:active{transform:scale(.98)}
+.btn[disabled]{opacity:.4;pointer-events:none}
+.info{background:var(--gray);border-radius:12px;padding:12px 14px;font-size:.9rem}
+.info a{color:var(--link);font-weight:600;text-decoration:none}
+
+.preview{min-width:0}
+.top{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.top h2{font-size:1.4rem}
+.grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(calc(var(--qr) + 56px),1fr))}
+.grid[data-size="small"]{--qr:150px;--cols:3}
+.grid[data-size="medium"]{--qr:190px;--cols:2}
+.grid[data-size="large"]{--qr:240px;--cols:2}
+
+/* Kaarten blijven altijd wit met zwarte QR, ook in donkere modus */
+.card{background:#fff;color:#000;border:1.5px dashed #b5b5b5;border-radius:16px;padding:22px 18px;text-align:center;display:grid;gap:8px;justify-items:center;break-inside:avoid}
+.c-hotel{font-weight:700;font-size:.95rem;letter-spacing:-.01em}
+.c-label{color:#666;font-size:.78rem}
+.c-room{font-size:2.6rem;font-weight:800;letter-spacing:-.03em;line-height:1}
+.qr{width:var(--qr);height:var(--qr);margin:6px 0 4px}
+.qr img,.qr canvas{width:100% !important;height:100% !important;display:block}
+.c-txt{font-size:.82rem;color:#333;line-height:1.35}
+.c-txt span{display:block}
+.empty{border:1.5px dashed var(--line);border-radius:16px;padding:48px 20px;text-align:center;color:var(--muted)}
+
+@media (prefers-reduced-motion:no-preference){
+  @keyframes cardIn{from{opacity:0;transform:translateY(10px)}}
+  .card{animation:cardIn .35s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i,0) * 18ms)}
+}
+
+@page{size:A4;margin:10mm}
+@media print{
+  body{background:#fff;color:#000}
+  .bar,.controls,.top{display:none !important}
+  .layout{display:block;padding:0;max-width:none}
+  .grid{grid-template-columns:repeat(var(--cols),1fr);gap:8mm}
+  .card{animation:none;border-color:#999}
+}
 </style>
 </head>
 <body>
-<div class="ctl">
-  <h2 style="margin:0">QR-codes per kamer</h2>
-  <label>Link van je app<input id="base" value="https://hotel-app.vercel.app/"></label>
-  <label>Hotelnaam<input id="hotel" value="Hotel Maashaven"></label>
-  <label>Kamers (bijv. 101-110, 201-210)<input id="rooms" value="101-105"></label>
-  <button id="go">Maak QR-codes</button>
-  <small>Daarna printen via Cmd+P. Alleen de kaarten worden geprint.</small>
-</div>
-<div class="grid" id="grid"></div>
+<header class="bar"><div class="bar-in"><span class="mark" aria-hidden="true">M</span><span>QR-codes</span></div></header>
+
+<main class="layout">
+  <aside class="controls">
+    <div>
+      <h1>QR-codes voor kamers</h1>
+      <p class="muted" style="margin-top:8px">Gasten scannen de code en bestellen direct, met hun kamernummer al ingevuld.</p>
+    </div>
+
+    <label class="field">Link van je app
+      <input id="base" type="url" inputmode="url" placeholder="https://jouw-app.vercel.app" autocomplete="off" spellcheck="false">
+      <span class="err" id="base-err" role="alert"></span>
+    </label>
+
+    <label class="field">Hotelnaam
+      <input id="hotel" placeholder="Hotel Maashaven" autocomplete="off">
+    </label>
+
+    <div class="field">
+      <label for="rooms" style="font-weight:600">Kamers</label>
+      <input id="rooms" placeholder="101-110, 201-210" autocomplete="off">
+      <span class="hint">Gebruik een streepje voor een reeks en een komma voor losse kamers.</span>
+      <div class="chips" id="presets">
+        <button class="chip" data-r="101-110">101-110</button>
+        <button class="chip" data-r="101-120, 201-220">2 verdiepingen</button>
+        <button class="chip" data-r="1-30">1-30</button>
+      </div>
+    </div>
+
+    <div class="row2">
+      <label class="field">Grootte
+        <select id="size"><option value="small">Klein</option><option value="medium" selected>Middel</option><option value="large">Groot</option></select>
+      </label>
+      <label class="field">Taal op kaart
+        <select id="lang"><option value="all" selected>NL, EN, DE</option><option value="nl">Alleen NL</option><option value="en">Alleen EN</option><option value="de">Alleen DE</option></select>
+      </label>
+    </div>
+
+    <button class="btn" id="print" disabled>Printen of opslaan als PDF</button>
+    <div class="info" id="test" hidden></div>
+    <p class="muted small">Print op stevig papier en leg de kaart in elke kamer, bijvoorbeeld op het bureau of bij de telefoon. Snij langs de stippellijn.</p>
+  </aside>
+
+  <section class="preview">
+    <div class="top"><h2>Voorbeeld</h2><span class="muted" id="count"></span></div>
+    <div class="grid" id="grid" data-size="medium"></div>
+    <div class="empty" id="empty">Vul een link en kamers in om QR-codes te maken.</div>
+  </section>
+</main>
+
 <script>
-function parse(t){
-  const out=[];
-  t.split(",").forEach(p=>{
-    p=p.trim(); if(!p) return;
-    const m=p.match(/^(\d+)-(\d+)$/);
-    if(m){ for(let i=+m[1];i<=+m[2]&&out.length<500;i++) out.push(String(i)); }
-    else out.push(p);
-  });
-  return out;
+const $ = s => document.querySelector(s);
+const KEY = "qrSettings";
+const TXT = {
+  nl:{room:"Kamer", line:"Scan en bestel eten op je kamer"},
+  en:{room:"Room", line:"Scan to order food to your room"},
+  de:{room:"Zimmer", line:"Scannen und Essen aufs Zimmer bestellen"}
+};
+const MAX = 200;
+
+function defaultBase(){
+  if(location.protocol.indexOf("http") === 0) return location.origin + location.pathname.replace(/[^/]*$/, "");
+  return "";
 }
-document.getElementById("go").addEventListener("click",()=>{
-  const base=document.getElementById("base").value.trim().replace(/\?.*$/,"");
-  const hotel=document.getElementById("hotel").value.trim();
-  const grid=document.getElementById("grid"); grid.innerHTML="";
-  parse(document.getElementById("rooms").value).forEach(r=>{
-    const c=document.createElement("div"); c.className="card";
-    c.innerHTML="<h3></h3><p>Scan en bestel eten op je kamer</p><div class='qr'></div>";
-    c.querySelector("h3").textContent=hotel+" · kamer "+r;
-    grid.appendChild(c);
-    new QRCode(c.querySelector(".qr"),{text:base+"?kamer="+encodeURIComponent(r),width:160,height:160});
+function load(){
+  let s = {};
+  try{ s = JSON.parse(localStorage.getItem(KEY) || "{}"); }catch(e){}
+  $("#base").value = s.base || defaultBase();
+  $("#hotel").value = s.hotel != null ? s.hotel : "Hotel Maashaven";
+  $("#rooms").value = s.rooms || "101-110";
+  $("#size").value = s.size || "medium";
+  $("#lang").value = s.lang || "all";
+}
+function save(){
+  try{ localStorage.setItem(KEY, JSON.stringify({base:$("#base").value, hotel:$("#hotel").value, rooms:$("#rooms").value, size:$("#size").value, lang:$("#lang").value})); }catch(e){}
+}
+function parseRooms(t){
+  const out = [];
+  t.split(",").forEach(p => {
+    p = p.trim(); if(!p) return;
+    const m = p.match(/^(\d+)\s*-\s*(\d+)$/);
+    if(m){ for(let i = +m[1]; i <= +m[2] && out.length <= MAX; i++) out.push(String(i)); }
+    else out.push(p.replace(/[^0-9A-Za-z-]/g, "").slice(0, 6));
   });
-});
+  return [...new Set(out.filter(Boolean))];
+}
+function makeUrl(base, room){
+  const u = new URL(base);
+  if(u.protocol !== "http:" && u.protocol !== "https:") throw new Error("protocol");
+  u.searchParams.set("kamer", room);
+  return u.toString();
+}
+
+function render(){
+  save();
+  const grid = $("#grid"), err = $("#base-err"), baseVal = $("#base").value.trim();
+  grid.innerHTML = ""; err.textContent = "";
+  grid.dataset.size = $("#size").value;
+  let rooms = parseRooms($("#rooms").value), capped = false;
+  if(rooms.length > MAX){ rooms = rooms.slice(0, MAX); capped = true; }
+  let ok = true;
+  if(baseVal){ try{ makeUrl(baseVal, "1"); }catch(e){ ok = false; err.textContent = "Dit is geen geldige link. Begin met https://"; } }
+  else ok = false;
+  const ready = ok && rooms.length > 0 && !!window.QRCode;
+  $("#empty").classList.toggle("hidden", ready);
+  $("#print").disabled = !ready;
+  $("#test").hidden = !ready;
+  if(!window.QRCode && ok && rooms.length){ $("#empty").classList.remove("hidden"); $("#empty").textContent = "De QR-bibliotheek kon niet laden. Controleer je internetverbinding of adblocker en ververs de pagina."; return; }
+  $("#empty").textContent = "Vul een link en kamers in om QR-codes te maken.";
+  if(!ready){ $("#count").textContent = ""; return; }
+
+  const hotel = $("#hotel").value.trim(), lang = $("#lang").value, langs = lang === "all" ? ["nl","en","de"] : [lang];
+  rooms.forEach((r, i) => {
+    const url = makeUrl(baseVal, r), card = document.createElement("article");
+    card.className = "card"; card.style.setProperty("--i", Math.min(i, 30));
+    const hd = document.createElement("div"); hd.className = "c-hotel"; hd.textContent = hotel; if(!hotel) hd.hidden = true;
+    const lb = document.createElement("div"); lb.className = "c-label"; lb.textContent = langs.map(l => TXT[l].room).join(" / ");
+    const rm = document.createElement("div"); rm.className = "c-room"; rm.textContent = r;
+    const qr = document.createElement("div"); qr.className = "qr"; qr.setAttribute("role", "img"); qr.setAttribute("aria-label", "QR-code kamer " + r);
+    const tx = document.createElement("div"); tx.className = "c-txt";
+    langs.forEach(l => { const sp = document.createElement("span"); sp.textContent = TXT[l].line; tx.appendChild(sp); });
+    card.append(hd, lb, rm, qr, tx); grid.appendChild(card);
+    new QRCode(qr, {text:url, width:512, height:512, correctLevel:QRCode.CorrectLevel.M, colorDark:"#000000", colorLight:"#ffffff"});
+  });
+  $("#count").textContent = rooms.length + (rooms.length === 1 ? " kaart" : " kaarten") + (capped ? " (maximum " + MAX + ")" : "");
+  const first = makeUrl(baseVal, rooms[0]);
+  $("#test").innerHTML = "Test de eerste code: <a href=\"\" target=\"_blank\" rel=\"noopener\"></a>";
+  const a = $("#test a"); a.href = first; a.textContent = "kamer " + rooms[0] + " openen";
+}
+
+let tmr = null;
+const later = () => { clearTimeout(tmr); tmr = setTimeout(render, 250); };
+["base","hotel","rooms"].forEach(id => $("#" + id).addEventListener("input", later));
+["size","lang"].forEach(id => $("#" + id).addEventListener("change", render));
+$("#presets").addEventListener("click", e => { const b = e.target.closest("[data-r]"); if(b){ $("#rooms").value = b.dataset.r; render(); } });
+$("#print").addEventListener("click", () => window.print());
+
+load(); render();
 </script>
 </body>
 </html>

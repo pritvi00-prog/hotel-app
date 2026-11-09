@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Hotel Maashaven – Bestel uit de buurt</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://veggbrabijaqdlomwtkg.supabase.co" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <style>
@@ -221,6 +222,35 @@ tr:last-child td{border-bottom:0}
 
 .toast{position:fixed;width:max-content;left:50%;top:76px;transform:translateX(-50%);background:var(--btn);color:var(--btn-ink);padding:11px 20px;border-radius:999px;font-weight:600;display:none;z-index:40;box-shadow:var(--shadow);max-width:92vw}
 .toast.show{display:block}
+
+/* ---------- Soepele beweging ---------- */
+html{scroll-behavior:smooth;scrollbar-gutter:stable}
+.btn,.chip,.link,.cat,.add,.ctl button,.cartbtn,.round,.x,.lang button,.rest,.textbtn{transition:background-color .2s,color .2s,transform .14s,filter .2s,opacity .2s,outline-color .2s}
+.btn:active,.chip:active,.link:active,.cartbtn:active,.ctl button:active,.round:active,.x:active{transform:scale(.96)}
+.rest:active{transform:scale(.985)}
+.btn.loading{color:transparent !important;position:relative;pointer-events:none}
+.btn.loading::after{content:"";position:absolute;width:20px;height:20px;border:2.5px solid var(--btn-ink);border-right-color:transparent;border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (hover:hover){.rest .cover{transition:transform .3s cubic-bezier(.2,.8,.2,1)}.rest:hover .cover{transform:scale(1.012)}}
+@media (prefers-reduced-motion:no-preference){
+  @keyframes viewIn{from{opacity:0;transform:translateY(10px)}}
+  @keyframes fadeIn{from{opacity:0}}
+  @keyframes fadeOut{to{opacity:0}}
+  @keyframes sheetUp{from{transform:translateY(40px);opacity:0}}
+  @keyframes sheetDown{to{transform:translateY(40px);opacity:0}}
+  @keyframes cartIn{from{transform:translateY(24px);opacity:0}}
+  @keyframes cardIn{from{opacity:0;transform:translateY(14px)}}
+  @keyframes bump{40%{transform:scale(1.35)}}
+  #v-guest,#v-login,#v-rest,#v-hotel,#v-recep,#g-list,#g-menu,#g-done,#rest-orders-wrap,#rest-menu{animation:viewIn .32s cubic-bezier(.2,.8,.2,1)}
+  .modal.open{animation:fadeIn .2s}
+  .modal.open .sheet{animation:sheetUp .32s cubic-bezier(.2,.8,.2,1)}
+  .modal.closing{animation:fadeOut .18s forwards}
+  .modal.closing .sheet{animation:sheetDown .18s forwards}
+  .cartbar:not(.hidden){animation:cartIn .32s cubic-bezier(.2,.8,.2,1)}
+  .rests.stagger .rest{animation:cardIn .45s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i,0) * 45ms)}
+  .cover img,.thumb img,.banner img,.upl-img img{animation:fadeIn .45s}
+  .ctl output.bump{animation:bump .22s}
+}
 </style>
 </head>
 <body>
@@ -475,9 +505,11 @@ async function loadData(){
         method:r.method, platform:r.platform, url:r.url, rate:Number(r.rate), opens:r.opens, closes:r.closes, tracking:!!r.tracking, image:r.image_url || "", hours:r.hours || null,
         menu: ms.filter(m => m.restaurant_id === r.id).map(m => [m.name, m.price == null ? null : Number(m.price), m.image_url || "", m.id, m.category || "", m.description || "", m.available !== false])};
     });
+    try{ localStorage.setItem("catalog", JSON.stringify(RESTAURANTS)); }catch(e){}
   }catch(e){ console.error(e); toast(t("dbFail")); }
   state.loaded = true;
   renderRests();
+  if(state.open && !state.done && !Object.keys(state.cart).length && $("#items") && find(state.open)) renderItems(find(state.open), true);
 }
 
 async function loadOrders(){
@@ -525,7 +557,7 @@ function go(v){
   $("#nav-dash").classList.toggle("hidden", !(state.auth && v === "guest"));
   $("#nav-staff").classList.toggle("hidden", !(!state.auth && v === "guest"));
   $("#logout").classList.toggle("hidden", !state.auth);
-  window.scrollTo(0, 0);
+  window.scrollTo({top:0, behavior:"instant"});
   refresh();
 }
 async function refresh(){
@@ -533,6 +565,12 @@ async function refresh(){
   if(state.view === "rest"){ await loadOrders(); renderRestView(); }
   if(state.view === "hotel"){ await loadOrders(); renderHotel(); }
   if(state.view === "recep"){ await loadOrders(); renderRecep(); }
+}
+
+function closeSheet(el){
+  if(!el.classList.contains("open")) return;
+  el.classList.add("closing");
+  setTimeout(() => el.classList.remove("open", "closing"), 180);
 }
 
 /* ---------- Gast ---------- */
@@ -584,9 +622,10 @@ function renderRests(){
   const el = $("#rests");
   if(!state.loaded){ el.innerHTML = '<div class="skel"></div>'.repeat(3); return; }
   renderCats();
+  el.classList.toggle("stagger", !state.animated); state.animated = true;
   const list = RESTAURANTS.filter(r => (state.cat === "Alles" || r.kind === state.cat) && (!state.q || (r.name + " " + r.kind).toLowerCase().includes(state.q)));
-  el.innerHTML = list.length ? list.map(r => { const open = isOpen(r); return `
-    <button class="rest${open ? "" : " closed"}" data-id="${esc(r.id)}">
+  el.innerHTML = list.length ? list.map((r, ix) => { const open = isOpen(r); return `
+    <button class="rest${open ? "" : " closed"}" style="--i:${ix}" data-id="${esc(r.id)}">
       <div class="cover" style="background:${tint(r.color)}" aria-hidden="true">${kindEmoji(r.kind)}${imgTag(r.image)}
         ${!open ? `<span class="tag closed">${t("closed")}</span>` : r.method === "direct" ? `<span class="tag direct">${I.check}${t("orderDirect")}</span>` : `<span class="tag">${I.ext}${esc(t("via", {p:r.platform}))}</span>`}
       </div>
@@ -611,14 +650,14 @@ function pick(id){
   state.open = id; state.cart = {}; state.done = null;
   renderGuest(); window.scrollTo(0, 0);
 }
-$("#m-close").addEventListener("click", () => $("#modal").classList.remove("open"));
+$("#m-close").addEventListener("click", () => closeSheet($("#modal")));
 $("#m-copy").addEventListener("click", async () => {
   try{ await navigator.clipboard.writeText($("#m-addr").textContent); toast(t("copied")); }
   catch(e){ toast(t("copyFail")); }
 });
 $("#m-go").addEventListener("click", () => {
   window.open(state.pending.url, "_blank", "noopener");
-  $("#modal").classList.remove("open");
+  closeSheet($("#modal"));
 });
 
 function renderGuest(){
@@ -669,6 +708,8 @@ $("#g-menu").addEventListener("click", e => {
   const b = e.target.closest("button[data-d]"); if(!b) return;
   const i = +b.dataset.i; state.cart[i] = Math.max(0, (state.cart[i] || 0) + (+b.dataset.d));
   renderItems(r); updateCart();
+  const hit = document.querySelector('#items [data-i="' + i + '"]'), out = hit && hit.closest(".ctl") && hit.closest(".ctl").querySelector("output");
+  if(out) out.classList.add("bump");
 });
 
 function cartTotals(){
@@ -681,7 +722,7 @@ function updateCart(){
   $("#cart").classList.toggle("hidden", !(c.n > 0 && state.view === "guest" && state.open && !state.done));
   $("#cart-c").textContent = c.n;
   $("#cart-t").textContent = eur(c.t);
-  if(c.n === 0 && $("#csheet").classList.contains("open")) $("#csheet").classList.remove("open");
+  if(c.n === 0 && $("#csheet").classList.contains("open")) closeSheet($("#csheet"));
 }
 function openCart(){
   const r = find(state.open), c = cartTotals();
@@ -695,20 +736,20 @@ function openCart(){
   $("#csheet").classList.add("open");
 }
 $("#open-cart").addEventListener("click", openCart);
-$("#c-close").addEventListener("click", () => $("#csheet").classList.remove("open"));
-$("#csheet").addEventListener("click", e => { if(e.target.id === "csheet") $("#csheet").classList.remove("open"); });
+$("#c-close").addEventListener("click", () => closeSheet($("#csheet")));
+$("#csheet").addEventListener("click", e => { if(e.target.id === "csheet") closeSheet($("#csheet")); });
 
 $("#place").addEventListener("click", async () => {
   const r = find(state.open), c = cartTotals();
   if(!room()){ toast(t("needRoom")); return; }
-  const btn = $("#place"); btn.disabled = true;
+  const btn = $("#place"); btn.disabled = true; btn.classList.add("loading");
   const token = uuid();
   try{
     await sb("orders", {method:"POST", headers:{Prefer:"return=minimal"},
       body:JSON.stringify({token, restaurant_id:r.id, room:room(), items:c.items, total:c.t, commission:Math.round(c.t * r.rate * 100) / 100})});
-  }catch(e){ console.error(e); toast(t("orderFail")); btn.disabled = false; return; }
-  btn.disabled = false;
-  $("#csheet").classList.remove("open");
+  }catch(e){ console.error(e); toast(t("orderFail")); btn.disabled = false; btn.classList.remove("loading"); return; }
+  btn.disabled = false; btn.classList.remove("loading");
+  closeSheet($("#csheet"));
   state.done = {token, rest:r.name, items:c.items, total:c.t, room:room(), status:"Nieuw", at:Date.now(), track:!!r.tracking, pos:null};
   saveOrder(state.done);
   state.open = null; state.cart = {};
@@ -935,6 +976,10 @@ try{
 applyStatic();
 go("guest");
 if(state.done){ renderGuest(); pollStatus(); }
+try{
+  const c = JSON.parse(localStorage.getItem("catalog") || "null");
+  if(Array.isArray(c) && c.length){ RESTAURANTS = c; state.loaded = true; }
+}catch(e){}
 renderRests();
 loadData();
 </script>
