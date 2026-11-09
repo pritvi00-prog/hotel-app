@@ -103,6 +103,7 @@ th{color:var(--muted);font-weight:600}
 .addr{background:var(--chip);border-radius:10px;padding:12px;font-weight:600}
 .toast{position:fixed;left:50%;top:calc(14px + env(safe-area-inset-top,0px));transform:translateX(-50%);background:var(--good);color:#fff;padding:10px 18px;border-radius:999px;font-weight:600;display:none;z-index:20}
 .toast.show{display:block}
+.field{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;width:100%}
 .hidden{display:none !important}
 @media (min-width:700px){.card-room{grid-template-columns:1.3fr 1fr;align-items:end;padding:34px}.modal{align-items:center}}
 @media (prefers-reduced-motion:no-preference){.toast.show{animation:pop .25s ease-out}@keyframes pop{from{opacity:0;transform:translate(-50%,-8px)}}}
@@ -119,6 +120,7 @@ th{color:var(--muted);font-weight:600}
       <button role="tab" aria-selected="false" data-view="rest">Restaurant</button>
       <button role="tab" aria-selected="false" data-view="hotel">Hotel</button>
     </div>
+    <button class="btn ghost hidden" id="logout">Uitloggen</button>
   </header>
 
   <!-- GAST -->
@@ -138,6 +140,17 @@ th{color:var(--muted);font-weight:600}
     <div class="row-head"><h2>Restaurants in de buurt</h2><span class="sub" id="count"></span></div>
     <div class="list" id="rests"></div>
     <div id="menu"></div>
+  </section>
+
+  <!-- INLOGGEN -->
+  <section id="v-login" class="hidden">
+    <div class="row-head"><h2>Inloggen</h2></div>
+    <div class="panel" style="display:grid;gap:12px;max-width:420px">
+      <p class="sub" id="login-msg" style="margin:0"></p>
+      <input class="field" id="l-mail" type="email" autocomplete="username" placeholder="E-mailadres" aria-label="E-mailadres">
+      <input class="field" id="l-pw" type="password" autocomplete="current-password" placeholder="Wachtwoord" aria-label="Wachtwoord">
+      <button class="btn" id="l-go">Inloggen</button>
+    </div>
   </section>
 
   <!-- RESTAURANT -->
@@ -211,10 +224,36 @@ let RESTAURANTS = FALLBACK;
 async function sb(path, opts = {}){
   const res = await fetch(SB_URL + "/rest/v1/" + path, {
     ...opts,
-    headers: {apikey: SB_KEY, "Content-Type": "application/json", Prefer: "return=representation", ...(opts.headers || {})}
+    headers: {apikey: SB_KEY, ...(state.auth ? {Authorization: "Bearer " + state.auth.token} : {}),
+      "Content-Type": "application/json", Prefer: "return=representation", ...(opts.headers || {})}
   });
+  if(res.status === 401 && state.auth){ logout(); toast("Sessie verlopen, log opnieuw in"); }
   if(!res.ok) throw new Error(await res.text());
-  return res.json();
+  const txt = await res.text();
+  return txt ? JSON.parse(txt) : null;
+}
+
+/* Inloggen */
+state.auth = null;
+async function login(){
+  const email = $("#l-mail").value.trim(), password = $("#l-pw").value;
+  try{
+    const res = await fetch(SB_URL + "/auth/v1/token?grant_type=password", {method:"POST",
+      headers:{apikey:SB_KEY,"Content-Type":"application/json"}, body:JSON.stringify({email,password})});
+    if(!res.ok) throw new Error("login");
+    const s = await res.json();
+    state.auth = {token:s.access_token, role:null, restaurant_id:null, email};
+    const rows = await sb("staff?select=*");
+    if(!rows || !rows.length){ state.auth = null; toast("Geen toegang voor dit account"); return; }
+    state.auth.role = rows[0].role; state.auth.restaurant_id = rows[0].restaurant_id;
+    $("#l-pw").value = ""; $("#logout").classList.remove("hidden");
+    document.querySelector('.seg button[data-view="' + (state.auth.role === "hotel" ? "hotel" : "rest") + '"]').click();
+  }catch(e){ state.auth = null; toast("Inloggen mislukt: controleer e-mail en wachtwoord"); }
+}
+function logout(){
+  state.auth = null; state.orders = [];
+  $("#restPick").innerHTML = ""; $("#logout").classList.add("hidden");
+  render();
 }
 
 async function loadData(){
@@ -319,7 +358,7 @@ $("#place").addEventListener("click",async ()=>{
   const r=RESTAURANTS.find(x=>x.id===state.open), c=cartTotals();
   if(!room()){toast("Vul eerst je kamernummer in");return}
   try{
-    await sb("orders",{method:"POST",body:JSON.stringify({restaurant_id:r.id,room:room(),items:c.items,total:c.t,commission:Math.round(c.t*r.rate*100)/100})});
+    await sb("orders",{method:"POST",headers:{Prefer:"return=minimal"},body:JSON.stringify({restaurant_id:r.id,room:room(),items:c.items,total:c.t,commission:Math.round(c.t*r.rate*100)/100})});
   }catch(e){console.error(e);toast("Bestellen mislukt, probeer opnieuw");return}
   state.cart={}; state.open=null; renderMenu(); updateCart();
   toast("Besteld! "+r.name+" ontvangt je bestelling");
@@ -331,8 +370,8 @@ const NEXT = {Nieuw:"Geaccepteerd",Geaccepteerd:"Onderweg",Onderweg:"Bezorgd"};
 function renderRestView(){
   const sel=$("#restPick");
   if(!sel.options.length){
-    sel.innerHTML = RESTAURANTS.filter(r=>r.method==="direct").map(r=>`<option value="${r.id}">${r.name}</option>`).join("");
-    sel.addEventListener("change",renderRestView);
+    sel.innerHTML = RESTAURANTS.filter(r=>r.method==="direct" && (!state.auth || r.id===state.auth.restaurant_id)).map(r=>`<option value="${r.id}">${r.name}</option>`).join("");
+    sel.onchange = renderRestView;
   }
   const list = state.orders.filter(o=>o.restId===sel.value);
   $("#orders").innerHTML = list.length ? list.map(o=>`
@@ -366,9 +405,22 @@ function renderHotel(){
 
 async function render(){
   updateCart();
+  const need = state.view==="rest" ? "restaurant" : state.view==="hotel" ? "hotel" : null;
+  const ok = !need || (state.auth && state.auth.role===need);
+  $("#v-login").classList.toggle("hidden", ok);
+  if(need) $("#v-"+state.view).classList.toggle("hidden", !ok);
+  if(!ok){
+    $("#login-msg").textContent = state.auth
+      ? "Dit account heeft geen toegang tot dit tabblad. Log uit via de knop rechtsboven."
+      : "Log in als " + (need==="hotel" ? "hotel" : "restaurant") + " om verder te gaan.";
+    return;
+  }
   if(state.view==="rest"){ await loadOrders(); renderRestView(); }
   if(state.view==="hotel"){ await loadOrders(); renderHotel(); }
 }
+$("#l-go").addEventListener("click", login);
+$("#l-pw").addEventListener("keydown", e => { if(e.key === "Enter") login(); });
+$("#logout").addEventListener("click", () => { logout(); toast("Uitgelogd"); });
 renderRests();
 loadData();
 </script>
